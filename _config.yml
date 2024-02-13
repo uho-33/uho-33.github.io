@@ -94,9 +94,9 @@ comments:
   # Giscus options › https://giscus.app
   giscus:
     repo: uho-33/uho-33.github.io # <gh-username>/<repo>
-    repo_id: R_kgDOLQb47w
+    repo_id: R_kgDOLRr_AQ
     category: Announcements
-    category_id: DIC_kwDOLQb4784CdHGo
+    category_id: DIC_kwDOLRr_Ac4CdMGH
     mapping: # optional, default to 'pathname'
     input_position: # optional, default to 'bottom'
     lang: # optional, default to the value of `site.lang`
