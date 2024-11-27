@@ -14,6 +14,6 @@ order: 4
 
 暂时想到这么多。如果你想第一时间获取更新通知，欢迎采用 RSS 订阅或[邮箱订阅](https://mailchi.mp/225c2d7a0bf1/kohis-blog)[^1]本博客~
 
-[^1]: 邮箱订阅功能目前由 mailchimp 实现，为博客更新日晚 8 点推送
+[^1]: 邮箱订阅功能目前由 mailchimp 实现，为博客更新日晚 8 点推送，如订阅后未受到订阅成功的邮件，请查看垃圾邮件〒▽〒
 
 所有文章除特别声明外，均采用“署名—非商业性使用 4.0 协议国际版“ （[CC BY-NC 4.0](https://www.creativecommons.org/licenses/by-nc/4.0/deed.zh-hans)）许可协议。
