@@ -38,14 +38,14 @@ social:
   links:
     # The first element serves as the copyright owner's link
     #- https://twitter.com/username # change to your twitter homepage
-    - https://github.com/username # change to your github homepage
+    - https://github.com/uho-33 # change to your github homepage
     # Uncomment below to add more social links
     # - https://www.facebook.com/username
     # - https://www.linkedin.com/in/username
 
 # Site Verification Settings
 webmaster_verifications:
-  google: # fill in your Google verification code
+  google: google-site-verification=6Fuz_qv4dHQXLgIoOMlzs64IzSAV-7idA3G0RhAWwlM # fill in your Google verification code
   bing: # fill in your Bing verification code
   alexa: # fill in your Alexa verification code
   yandex: # fill in your Yandex verification code
@@ -57,7 +57,7 @@ webmaster_verifications:
 
 # Web Analytics Settings
 analytics:
-  google: 
+  google:
     id: 302129313 # fill in your Google Analytics ID
   goatcounter:
     id: # fill in your GoatCounter ID
