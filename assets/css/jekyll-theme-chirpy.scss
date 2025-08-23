@@ -2,21 +2,9 @@
 ---
 
 @import 'main
-{%- if jekyll.environment == ' production
-  ' -%}
+{%- if jekyll.environment == 'production' -%}
   .bundle
 {%- endif -%}
 ';
 
 /* append your custom style below */
-
-/* Make figure captions match Chirpy's default img caption */
-figure.chirpy-figure > figcaption {
-  display: block;
-  text-align: center;
-  font-style: normal;
-  font-size: 80%; /* same as %img-caption */
-  color: #6d6c6c; /* same muted color */
-  padding: 0;
-  margin-top: 0.25rem; /* light spacing above caption */
-}
