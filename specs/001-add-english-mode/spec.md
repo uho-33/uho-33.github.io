@@ -59,7 +59,7 @@ A blog visitor wants to read the content in English to overcome language barrier
 
 ### Acceptance Scenarios
 1. **Given** a visitor is viewing the blog in Chinese mode, **When** they click the English toggle, **Then** the interface switches to English and all visible content is translated to English
-2. **Given** a visitor is in English mode, **When** they navigate to different posts, **Then** each post displays pre-translated English content, or falls back to real-time translation if no pre-translation exists
+2. **Given** a visitor is in English mode, **When** they navigate to different posts, **Then** each post displays pre-translated English content
 3. **Given** the repository owner, **When** they modify LLM provider configuration files, **Then** the next build uses the updated translation provider
 4. **Given** the selected LLM provider is unavailable, **When** translation is requested, **Then** the system shows an error message and falls back to Chinese content
 
@@ -72,7 +72,7 @@ A blog visitor wants to read the content in English to overcome language barrier
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
-- **FR-001**: System MUST provide a language toggle button visible on all pages to switch between Chinese and English modes
+- **FR-001**: System MUST provide a language toggle button visible on all pages positioned in the top right area near the search button to switch between Chinese and English modes
 - **FR-002**: System MUST pre-translate blog post content from Chinese to English using LLM during website build process
 - **FR-003**: System MUST provide complete English localization including navigation, sidebar, footer, dates, and formatting during build process
 - **FR-004**: System MUST support multiple LLM translation providers (e.g., Gemini, OpenAI, Claude, local models)
@@ -81,13 +81,13 @@ A blog visitor wants to read the content in English to overcome language barrier
 - **FR-007**: System MUST preserve original formatting, links, and metadata in pre-translated content
 - **FR-008**: Build process MUST handle translation failures gracefully by falling back to Chinese-only content with build warnings
 - **FR-009**: Build process MUST respect LLM provider rate limits and implement retry mechanisms during translation phase
-- **FR-010**: Users MUST be able to report translation quality issues
-- **FR-011**: System MUST maintain user's language preference across browser sessions
-- **FR-012**: System MUST exclude code blocks, mathematical expressions, and proper nouns from translation to preserve technical accuracy
-- **FR-013**: System MUST provide real-time translation fallback (e.g., Google Translate) for posts that lack pre-generated English versions
-- **FR-014**: System MUST only retranslate content when source Chinese content has been modified, preserving existing translations otherwise
-- **FR-015**: System MUST format dates, numbers, and other locale-specific elements according to English conventions when in English mode
-- **FR-016**: System MUST only translate Chinese text content, preserving existing English, Japanese, or other non-Chinese languages as-is
+- **FR-010**: System MUST maintain user's language preference (Chinese/English) across browser sessions and page navigation
+- **FR-011**: System MUST exclude code blocks, mathematical expressions, and proper nouns from translation to preserve technical accuracy
+- **FR-012**: System MUST only retranslate content when source Chinese content has been modified, preserving existing translations otherwise
+- **FR-013**: System MUST format dates, numbers, and other locale-specific elements according to English conventions when in English mode
+- **FR-014**: System MUST only translate Chinese text content, preserving existing English, Japanese, or other non-Chinese languages as-is
+- **FR-015**: System MUST display a closeable banner in English mode informing readers that content is LLM-translated
+
 
 ### Key Entities *(include if feature involves data)*
 - **Translation**: Represents a translated version of content, includes source text, target text, provider used, timestamp, and quality indicators
@@ -98,7 +98,7 @@ A blog visitor wants to read the content in English to overcome language barrier
 
 ### Session 2025-09-25
 - Q: What is the acceptable translation response time for user experience? → A: Translation done in advance during website build
-- Q: How should the system handle new posts that haven't been translated yet? → A: Attempt real-time translation by something like google translator
+- Q: How should the system handle new posts that haven't been translated yet? → A: All posts will be pre-translated before deployment
 - Q: What level of admin authentication is required for LLM provider configuration? → A: This is deployed in github pages, so the owner of this repo
 - Q: How long should translated content be cached before retranslation? → A: Permanent - only retranslate when source changes
 - Q: What should be the scope of interface translation beyond post content? → A: Complete localization including dates, formatting
@@ -131,7 +131,7 @@ A blog visitor wants to read the content in English to overcome language barrier
 - [x] Key concepts extracted (language toggle, LLM translation, provider switching, caching)
 - [x] Ambiguities marked (content exclusion rules resolved)
 - [x] User scenarios defined (visitor experience, admin configuration, error handling)
-- [x] Requirements generated (16 functional requirements covering core functionality)
+- [x] Requirements generated (15 functional requirements covering core functionality)
 - [x] Entities identified (Translation, Provider Config, User Preference)
 - [x] Review checklist passed
 

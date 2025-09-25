@@ -2,7 +2,7 @@
 # Implementation Plan: Add English Mode with LLM Translation
 
 **Branch**: `001-add-english-mode` | **Date**: 2025-09-25 | **Spec**: [spec.md](./spec.md)
-**Input**: Feature specification from `/specs/001-add-english-mode/spec.md`
+**Input**: Feature specification from `E:\code\my-blog\uho-33.github.io\specs\001-add-english-mode\spec.md`
 
 ## Execution Flow (/plan command scope)
 ```
@@ -31,18 +31,18 @@
 - Phase 3-4: Implementation execution (manual or via tools)
 
 ## Summary
-Add English language support to the Jekyll Chirpy blog through build-time LLM translation with real-time fallback. Features include language toggle, pre-translated static pages, configurable LLM providers, selective Chinese-only translation (preserving other languages), and complete localization including dates and formatting. Implementation uses Jekyll plugin architecture with GitHub Pages compatibility.
+Add bilingual support to Jekyll blog using Jekyll-Polyglot plugin for internationalization infrastructure combined with Gemini API for content translation. System will provide language toggle UI, maintain separate language versions, and implement build-time translation using LLM APIs with fallback mechanisms for missing content.
 
 ## Technical Context
 **Language/Version**: Ruby 3.0+, Jekyll 4.3+, Liquid templating  
-**Primary Dependencies**: Jekyll Chirpy theme, Jekyll plugins, LLM APIs (Gemini/OpenAI/Claude), Google Translate API  
+**Primary Dependencies**: Jekyll-Polyglot plugin, Gemini API (via GEMINI_API_KEY env var), Jekyll-Chirpy theme  
 **Storage**: File-based (Markdown posts, YAML data files, static assets)  
-**Testing**: Jekyll local server, HTML-Proofer for link validation, manual translation quality checks  
-**Target Platform**: GitHub Pages static hosting, modern web browsers  
-**Project Type**: web - Jekyll static site with build-time processing  
-**Performance Goals**: <3s page load, build-time translation to eliminate runtime latency  
-**Constraints**: GitHub Pages limitations, API rate limits, Jekyll plugin restrictions  
-**Scale/Scope**: Personal blog, ~50 posts initially, bilingual content, configurable providers
+**Testing**: Jekyll build verification, link checking, translation quality validation  
+**Target Platform**: GitHub Pages, static web hosting  
+**Project Type**: single (Jekyll static site)  
+**Performance Goals**: Build-time translation processing, maintain current site load speeds  
+**Constraints**: GitHub Pages compatibility, preserve Chirpy theme functionality, API rate limits  
+**Scale/Scope**: Personal blog (~5 posts initially), bilingual (Chinese/English), extensible to more languages
 
 ## Constitution Check
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
@@ -68,42 +68,33 @@ specs/[###-feature]/
 
 ### Source Code (repository root)
 ```
-# Option 1: Single project (DEFAULT)
-src/
-├── models/
-├── services/
-├── cli/
-└── lib/
-
-tests/
-├── contract/
-├── integration/
-└── unit/
-
-# Option 2: Web application (when "frontend" + "backend" detected)
-backend/
-├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
-└── tests/
-
-frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
-
-# Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
+# Jekyll Static Site Structure
+_config.yml              # Main config + Polyglot settings
+Gemfile                 # Ruby dependencies including jekyll-polyglot
+_plugins/               # Custom translation plugins
+├── translation_processor.rb
+└── content_filter.rb
+_data/
+├── locales/           # UI translations (existing)
+├── en/               # English-specific data
+└── translations/     # LLM translation cache
+_layouts/              # Existing Chirpy layouts
+_includes/             # Language switcher components
+├── language-toggle.html
+└── translation-status.html  
+_posts/               # Bilingual posts
+├── 2024-02-14-sophomore-notes.md (zh-CN)
+├── en/2024-02-14-sophomore-notes.md (English)
+└── ...
+_sass/                # Styling for language features
+assets/js/            # Client-side language persistence
+```
 
 ios/ or android/
 └── [platform-specific structure]
 ```
 
-**Structure Decision**: Jekyll static site structure - using existing Jekyll/Chirpy directories with plugin extensions
+**Structure Decision**: Jekyll static site structure - integrating i18n capabilities into existing Chirpy theme architecture
 
 ## Phase 0: Outline & Research
 1. **Extract unknowns from Technical Context** above:
@@ -164,18 +155,19 @@ ios/ or android/
 
 **Task Generation Strategy**:
 - Load `.specify/templates/tasks-template.md` as base
-- Generate tasks from Phase 1 design docs (contracts, data model, quickstart)
-- Each contract → contract test task [P]
-- Each entity → model creation task [P] 
-- Each user story → integration test task
-- Implementation tasks to make tests pass
+- Generate Jekyll-specific tasks from design docs (contracts, data model, quickstart)
+- Configuration setup tasks: Polyglot config, Gemfile updates, environment setup
+- Plugin development tasks: Translation processor, content filter, language detector
+- UI component tasks: Language toggle, fallback notices, SEO meta tags  
+- Content processing tasks: Translation cache, batch processing, error handling
+- Testing tasks: Build verification, translation quality, link checking
 
 **Ordering Strategy**:
-- TDD order: Tests before implementation 
-- Dependency order: Models before services before UI
-- Mark [P] for parallel execution (independent files)
+- Setup → Configuration → Plugins → UI Components → Content Processing → Testing
+- Dependencies: Polyglot before custom plugins, plugins before UI components
+- Mark [P] for parallel execution (independent files/features)
 
-**Estimated Output**: 25-30 numbered, ordered tasks in tasks.md
+**Estimated Output**: 30 numbered, ordered tasks in tasks.md specific to Jekyll bilingual setup
 
 **IMPORTANT**: This phase is executed by the /tasks command, NOT by /plan
 
@@ -202,7 +194,7 @@ ios/ or android/
 - [x] Phase 0: Research complete (/plan command)
 - [x] Phase 1: Design complete (/plan command)
 - [x] Phase 2: Task planning complete (/plan command - describe approach only)
-- [x] Phase 3: Tasks generated (/tasks command)
+- [ ] Phase 3: Tasks generated (/tasks command)
 - [ ] Phase 4: Implementation complete
 - [ ] Phase 5: Validation passed
 
@@ -213,4 +205,4 @@ ios/ or android/
 - [x] Complexity deviations documented
 
 ---
-*Based on Constitution v1.1.0 - See `.specify/memory/constitution.md`*
+*Based on Constitution v1.1.1 - See `.specify/memory/constitution.md`*

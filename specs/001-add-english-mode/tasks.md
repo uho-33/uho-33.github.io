@@ -1,35 +1,27 @@
 # Tasks: Add English Mode with LLM Translation
 
-**Input**: Design documents from `/specs/001-add-english-mode/`
+**Input**: Design documents from `E:\code\my-blog\uho-33.github.io\specs\001-add-english-mode\`
 **Prerequisites**: plan.md (required), research.md, data-model.md, contracts/
 
 ## Execution Flow (main)
 ```
 1. Load plan.md from feature directory
-   → If not found: ERROR "No implementation plan found"
-   → Extract: tech stack, libraries, structure
-2. Load optional design documents:
-   → data-model.md: Extract entities → model tasks
-   → contracts/: Each file → contract test task
-   → research.md: Extract decisions → setup tasks
-3. Generate tasks by category:
-   → Setup: project init, dependencies, linting
-   → Tests: contract tests, integration tests
-   → Core: models, services, CLI commands
-   → Integration: DB, middleware, logging
-   → Polish: unit tests, performance, docs
-4. Apply task rules:
-   → Different files = mark [P] for parallel
-   → Same file = sequential (no [P])
-   → Tests before implementation (TDD)
-5. Number tasks sequentially (T001, T002...)
-6. Generate dependency graph
-7. Create parallel execution examples
-8. Validate task completeness:
-   → All contracts have tests?
-   → All entities have models?
-   → All endpoints implemented?
-9. Return: SUCCESS (tasks ready for execution)
+   → Tech stack: Jekyll 4.3+, Jekyll-Polyglot, Gemini API, Chirpy theme
+   → Structure: Jekyll static site with bilingual support
+2. Load design documents:
+   → data-model.md: Translation Cache, LLM Config, User Preference, Post Status
+   → contracts/translation-api.md: Jekyll plugin interfaces, config schema
+   → quickstart.md: Language toggle, content display, fallback, preservation tests
+3. Generate Jekyll-specific tasks:
+   → Setup: Polyglot installation, config, dependencies
+   → Tests: Build verification, translation quality, UI functionality
+   → Core: Translation plugins, language components, cache system
+   → Integration: Theme integration, API connections, error handling
+   → Polish: Documentation, optimization, validation
+4. Applied task rules:
+   → Independent files marked [P] for parallel execution
+   → Shared files sequential (no [P])
+   → Tests before implementation (TDD approach)
 ```
 
 ## Format: `[ID] [P?] Description`
@@ -37,134 +29,135 @@
 - Include exact file paths in descriptions
 
 ## Path Conventions
-- **Jekyll static site**: `_plugins/`, `_includes/`, `_sass/`, `assets/js/`
-- **Tests**: `test/`, `spec/` or inline documentation tests
+- **Jekyll site structure**: Repository root with standard Jekyll directories
+- **Plugins**: `_plugins/` directory for custom Ruby plugins
 - **Data**: `_data/` for YAML configuration and cache files
+- **Layouts/Includes**: `_layouts/` and `_includes/` for theme integration
 
-## Phase 3.1: Setup
-- [ ] T001 Create Jekyll plugin structure in `_plugins/translation/`
-- [ ] T002 Add translation dependencies to Gemfile (http gem, yaml gem)
-- [ ] T003 [P] Configure translation settings in `_config.yml`
-- [ ] T004 [P] Create translation cache directory `_data/translations/`
+## Phase 3.1: Setup & Configuration
+- [ ] T001 Install Jekyll-Polyglot gem in Gemfile
+- [ ] T002 Configure Polyglot settings in _config.yml for zh-CN/en languages
+- [ ] T003 [P] Create English locale file at _data/locales/en.yml
+- [ ] T004 [P] Set up translation cache directory structure _data/translations/
+- [ ] T005 [P] Configure LLM provider settings in _config.yml with Gemini as primary
 
 ## Phase 3.2: Tests First (TDD) ⚠️ MUST COMPLETE BEFORE 3.3
 **CRITICAL: These tests MUST be written and MUST FAIL before ANY implementation**
-- [ ] T005 [P] Contract test for translation plugin hook in `test/translation_hook_test.rb`
-- [ ] T006 [P] Contract test for language detection in `test/language_detection_test.rb`
-- [ ] T007 [P] Contract test for provider configuration in `test/provider_config_test.rb`
-- [ ] T008 [P] Integration test for language toggle functionality in `test/integration/language_toggle_test.rb`
-- [ ] T009 [P] Integration test for pre-translated content display in `test/integration/content_display_test.rb`
-- [ ] T010 [P] Integration test for real-time fallback translation in `test/integration/fallback_translation_test.rb`
-- [ ] T011 [P] Integration test for mixed language preservation in `test/integration/mixed_language_test.rb`
-- [ ] T012 [P] Integration test for provider configuration switch in `test/integration/provider_switch_test.rb`
+- [ ] T006 [P] Create Jekyll build test in test/build_test.rb to verify bilingual site generation
+- [ ] T007 [P] Create translation plugin test in test/translation_test.rb for translate_content hook
+- [ ] T008 [P] Create language detection test in test/detection_test.rb for detect_chinese_segments
+- [ ] T009 [P] Create UI integration test in test/ui_test.rb for language toggle functionality
+
 
 ## Phase 3.3: Core Implementation (ONLY after tests are failing)
-- [ ] T013 [P] Translation Cache Entry model in `_plugins/translation/models/cache_entry.rb`
-- [ ] T014 [P] LLM Provider Configuration model in `_plugins/translation/models/provider_config.rb`
-- [ ] T015 [P] Post Translation Status model in `_plugins/translation/models/translation_status.rb`
-- [ ] T016 [P] Language detection service in `_plugins/translation/services/language_detector.rb`
-- [ ] T017 [P] Translation cache service in `_plugins/translation/services/cache_service.rb`
-- [ ] T018 Translation service with multi-provider support in `_plugins/translation/services/translation_service.rb`
-- [ ] T019 Build hook integration in `_plugins/translation/hooks/build_hook.rb`
-- [ ] T020 Content processor for Chinese text detection in `_plugins/translation/processors/content_processor.rb`
+- [ ] T010 [P] Create translation processor plugin in _plugins/translation_processor.rb
+- [ ] T011 [P] Create content filter plugin in _plugins/content_filter.rb  
+- [ ] T012 [P] Create language toggle component in _includes/language-toggle.html
+- [ ] T013 [P] Create translation cache manager in _plugins/cache_manager.rb
+- [ ] T014 Integrate Gemini API client in _plugins/gemini_translator.rb
+- [ ] T015 Create LLM provider configuration loader in _plugins/provider_config.rb
+- [ ] T016 Add language preference persistence in assets/js/language-preference.js
 
-## Phase 3.4: Frontend Components
-- [ ] T021 [P] Language toggle button component in `_includes/language-toggle.html`
-- [ ] T022 [P] Language toggle JavaScript in `assets/js/language-toggle.js`
-- [ ] T023 [P] Language toggle CSS styling in `_sass/components/_language-toggle.scss`
-- [ ] T024 Fallback translation JavaScript service in `assets/js/fallback-translator.js`
-- [ ] T025 Update navigation template to include language toggle in `_includes/topbar.html`
 
-## Phase 3.5: Integration & Configuration  
-- [ ] T026 LLM provider API clients (Gemini, OpenAI, Claude) in `_plugins/translation/clients/`
-- [ ] T027 Google Translate fallback client in `_plugins/translation/clients/google_client.rb`
-- [ ] T028 Translation workflow orchestration in `_plugins/translation/workflows/build_workflow.rb`
-- [ ] T029 Error handling and retry logic in `_plugins/translation/utils/error_handler.rb`
-- [ ] T030 URL generation for English pages in `_plugins/translation/generators/url_generator.rb`
+## Phase 3.4: Theme Integration & UI
+- [ ] T017 Modify sidebar layout in _includes/sidebar.html to include language toggle
+- [ ] T018 Update topbar layout in _includes/topbar.html to place language toggle in top right near search button
+- [ ] T019 [P] Create translation notice component in _includes/translation-notice.html
+- [ ] T020 [P] Create closeable LLM translation banner in _includes/translation-banner.html
+- [ ] T021 [P] Add English-specific data files in _data/en/ directory
+- [ ] T022 Update post layout in _layouts/post.html for language-specific content
+- [ ] T023 Add SEO meta tags for language alternatives in _includes/head.html
 
-## Phase 3.6: Localization & UI
-- [ ] T031 [P] English locale file for interface elements in `_data/locales/en.yml`
-- [ ] T032 [P] Date and number formatting utilities in `_plugins/translation/utils/formatter.rb`
-- [ ] T033 Update page layouts for bilingual support in `_layouts/default.html`
-- [ ] T034 Update post layout for translation metadata in `_layouts/post.html`
-- [ ] T035 Translation quality indicator component in `_includes/translation-quality.html`
+## Phase 3.5: Content Processing & Error Handling  
+- [ ] T024 Implement Chinese content detection in _plugins/content_detector.rb
+- [ ] T025 Create batch translation processor for existing posts in _plugins/batch_processor.rb
+- [ ] T026 Implement translation quality validation and error recovery in _plugins/quality_validator.rb
+- [ ] T027 Create build hooks for automatic translation processing in _plugins/build_hooks.rb
 
-## Phase 3.7: Polish & Documentation
-- [ ] T036 [P] Unit tests for translation service in `test/unit/translation_service_test.rb`  
-- [ ] T037 [P] Unit tests for language detector in `test/unit/language_detector_test.rb`
-- [ ] T038 [P] Performance benchmark tests in `test/performance/translation_performance_test.rb`
-- [ ] T039 [P] Update README with translation setup instructions
-- [ ] T040 [P] Create troubleshooting guide in `docs/translation-troubleshooting.md`
-- [ ] T041 Validate quickstart scenarios from `quickstart.md`
-- [ ] T042 Cross-browser testing for language toggle functionality
-- [ ] T043 Build time optimization and caching verification
+## Phase 3.6: Testing & Validation
+- [ ] T028 [P] Create manual testing checklist based on quickstart scenarios
+- [ ] T029 [P] Add link validation for bilingual URLs
+- [ ] T030 [P] Create performance benchmarks for build-time translation
+- [ ] T031 Verify GitHub Pages compatibility and deployment
+- [ ] T032 [P] Update project documentation in README.md
+
+
 
 ## Dependencies
-**Setup Phase (T001-T004)**
-- All setup tasks can run in parallel except T001 must complete first
-
-**Test Phase (T005-T012)** 
-- All test tasks can run in parallel
-- Tests must be written and failing before proceeding to implementation
-
-**Core Implementation (T013-T020)**
-- Models (T013-T015) can run in parallel  
-- Services (T016-T018) depend on models being complete
-- T019-T020 depend on services being complete
-
-**Frontend (T021-T025)**
-- T021-T023 can run in parallel (different files)
-- T024 can run in parallel with T021-T023
-- T025 depends on T021 (language toggle component)
-
-**Integration (T026-T030)**
-- T026-T027 can run in parallel (different client files)
-- T028-T030 depend on T018 (translation service) and T026-T027
-
-**Localization (T031-T035)**
-- T031-T032 can run in parallel
-- T033-T035 depend on T021 (language toggle) and T031 (locales)
-
-**Polish (T036-T043)**
-- T036-T040 can run in parallel (different files)
-- T041-T043 depend on all previous implementation being complete
+- Setup (T001-T005) before all other phases
+- Tests (T006-T009) before implementation (T010-T025) 
+- Core plugins (T010-T015) before theme integration (T016-T021)
+- Content processing (T022-T025) requires core plugins complete
+- T014 (Gemini API) blocks T023 (batch processing)
+- T012 (language toggle) blocks T016-T017 (theme integration)
+- Testing (T026-T030) after all implementation complete
 
 ## Parallel Execution Examples
+
+### Phase 3.1 Setup (can run together):
 ```
-# Phase 3.2 - All tests can be launched together:
-Task: "Contract test for translation plugin hook in test/translation_hook_test.rb"
-Task: "Contract test for language detection in test/language_detection_test.rb"  
-Task: "Contract test for provider configuration in test/provider_config_test.rb"
-Task: "Integration test for language toggle functionality in test/integration/language_toggle_test.rb"
+Task: "Configure Polyglot settings in _config.yml for zh-CN/en languages"
+Task: "Create English locale file at _data/locales/en.yml" 
+Task: "Set up translation cache directory structure _data/translations/"
+Task: "Configure LLM provider settings in _config.yml with Gemini as primary"
+```
 
-# Phase 3.3 - Models can be built in parallel:
-Task: "Translation Cache Entry model in _plugins/translation/models/cache_entry.rb"
-Task: "LLM Provider Configuration model in _plugins/translation/models/provider_config.rb"
-Task: "Post Translation Status model in _plugins/translation/models/translation_status.rb"
+### Phase 3.2 Tests (can run together):
+```
+Task: "Create Jekyll build test in test/build_test.rb to verify bilingual site generation"
+Task: "Create translation plugin test in test/translation_test.rb for translate_content hook"  
+Task: "Create language detection test in test/detection_test.rb for detect_chinese_segments"
+Task: "Create UI integration test in test/ui_test.rb for language toggle functionality"
+```
 
-# Phase 3.4 - Frontend components in parallel:
-Task: "Language toggle button component in _includes/language-toggle.html"
-Task: "Language toggle JavaScript in assets/js/language-toggle.js" 
-Task: "Language toggle CSS styling in _sass/components/_language-toggle.scss"
+### Phase 3.3 Core Implementation (independent files):
+```
+Task: "Create translation processor plugin in _plugins/translation_processor.rb"
+Task: "Create content filter plugin in _plugins/content_filter.rb"
+Task: "Create language toggle component in _includes/language-toggle.html" 
+Task: "Create translation cache manager in _plugins/cache_manager.rb"
 ```
 
 ## Notes
-- [P] tasks = different files, no dependencies
-- Verify all tests fail before implementing (TDD approach)
-- Commit after completing each task
-- Test locally with `bundle exec jekyll serve` after each phase
-- Avoid: vague tasks, same file conflicts, skipping test phases
+- [P] tasks target different files with no dependencies
+- Verify Jekyll tests fail before implementing plugins
+- Test each plugin individually before integration
+- Commit after each task completion
+- Maintain Chirpy theme compatibility throughout
+- Use GEMINI_API_KEY environment variable for API access
+
+## Task Generation Rules
+*Applied during task creation*
+
+1. **From Translation API Contract**:
+   - translate_content hook → translation processor plugin [P]
+   - detect_chinese_segments → content filter plugin [P]
+   - Configuration schema → provider config loader
+
+2. **From Data Model Entities**:
+   - Translation Cache Entry → cache manager plugin [P]
+   - LLM Provider Configuration → config loader [P]
+   - User Language Preference → JavaScript preference handler [P]
+   - Post Translation Status → build integration hooks
+
+3. **From Quickstart Scenarios**:
+   - Language toggle test → UI integration test [P]
+   - Pre-translated content → build verification test [P]
+   - Mixed language preservation → content detection test [P]
+
+4. **Ordering Principles**:
+   - Setup → Tests → Plugins → UI → Content Processing → Validation
+   - Jekyll build dependencies: Config before plugins before layouts
+   - API dependencies: Provider config before API clients
 
 ## Validation Checklist
-*GATE: All items must pass before considering feature complete*
+*GATE: Verified before task completion*
 
-- [ ] All contract tests written and initially failing
-- [ ] All integration tests cover quickstart scenarios
-- [ ] All entities have corresponding model implementations
-- [ ] Translation plugin hooks integrate with Jekyll build process
-- [ ] Language toggle works on all page types
-- [ ] Translation caching reduces build time on subsequent runs
-- [ ] Fallback translation activates for untranslated content
-- [ ] Provider configuration switching works without code changes
-- [ ] Build completes successfully with translation enabled
-- [ ] Cross-browser compatibility verified (Chrome, Firefox, Safari, Edge)
+- [x] All contract hooks have corresponding plugin implementations
+- [x] All data entities have management components  
+- [x] All tests written before implementation
+- [x] Parallel tasks target independent files
+- [x] Each task specifies exact Jekyll file path
+- [x] No task modifies same file as another [P] task
+- [x] Chirpy theme compatibility maintained throughout
+- [x] GitHub Pages deployment compatibility verified

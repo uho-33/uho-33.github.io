@@ -1,14 +1,15 @@
 <!--
 Sync Impact Report:
-- Version change: 1.0.0 → 1.1.0
-- Modified principles: Refocused all principles on technical website development rather than content creation
+- Version change: 1.1.0 → 1.1.1
+- Modified principles: N/A (maintained existing principles)
 - Added sections: N/A
-- Removed sections: Content-focused requirements
-- Templates requiring updates: 
-  ✅ Updated: plan-template.md (Constitution Check section needs alignment)
-  ✅ Updated: spec-template.md (scope requirements aligned) 
-  ✅ Updated: tasks-template.md (task categorization aligned)
-- Follow-up TODOs: Update plan-template Constitution Check section
+- Removed sections: N/A
+- Templates requiring updates:
+  ✅ Updated: plan-template.md (Constitution Check section aligned, version reference corrected)
+  ✅ Updated: spec-template.md (no changes needed)
+  ✅ Updated: tasks-template.md (no changes needed)
+  ✅ Updated: agent-file-template.md (no changes needed)
+- Follow-up TODOs: None
 -->
 
 # Kohi's Blog Constitution
@@ -42,4 +43,4 @@ All website modifications follow Git workflow with feature branches and proper c
 
 Constitution governs website development only, not content creation. All technical modifications must preserve Chirpy theme's core functionality and update compatibility. Breaking changes require thorough testing and documentation. Amendment process requires impact analysis on existing features and deployment pipeline.
 
-**Version**: 1.1.0 | **Ratified**: 2025-09-25 | **Last Amended**: 2025-09-25
+**Version**: 1.1.1 | **Ratified**: 2025-09-25 | **Last Amended**: 2025-09-25

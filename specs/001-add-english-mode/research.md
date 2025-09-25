@@ -11,12 +11,15 @@
 
 ## Jekyll Plugin Architecture
 
-### Decision: Custom Jekyll plugin with hooks
-**Rationale**: Chirpy theme compatibility, build-time execution, GitHub Pages support through allowed plugins.
+### Decision: Jekyll-Polyglot plugin with custom translation processor
+**Rationale**: Mature i18n infrastructure, handles URL routing and fallbacks, compatible with Chirpy theme, supports GitHub Pages deployment.
 **Alternatives considered**:
+- Custom Jekyll plugin only (rejected - reinventing i18n wheel)
 - Direct theme modification (rejected - breaks updates)
 - External build script (rejected - complicates deployment)
 - Runtime JavaScript translation (rejected - performance impact)
+
+**Integration approach**: Use Polyglot for i18n structure, add custom plugin for LLM translation processing
 
 ## Translation Caching Strategy
 
@@ -47,9 +50,12 @@
 
 ## Localization Implementation
 
-### Decision: Jekyll i18n plugin with custom locale files
-**Rationale**: Standard Jekyll approach, supports dates/formatting, maintains theme compatibility.
+### Decision: Jekyll-Polyglot with extended locale files
+**Rationale**: Leverages Polyglot's mature i18n system, integrates with existing Chirpy locale structure, supports date/number formatting, automatic URL relativization.
 **Alternatives considered**:
 - Manual liquid template modifications (rejected - maintenance burden)
 - JavaScript-based localization (rejected - runtime overhead)
 - Duplicate site structure (rejected - complexity)
+- Custom i18n system (rejected - Polyglot already solves this)
+
+**Implementation**: Extend existing `_data/locales/` with English translations, use Polyglot's `site.active_lang` for dynamic switching
