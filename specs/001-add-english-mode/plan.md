@@ -35,7 +35,7 @@ Add bilingual support to Jekyll blog using Jekyll-Polyglot plugin for internatio
 
 ## Technical Context
 **Language/Version**: Ruby 3.0+, Jekyll 4.3+, Liquid templating  
-**Primary Dependencies**: Jekyll-Polyglot plugin, Gemini API (via GEMINI_API_KEY env var), Jekyll-Chirpy theme  
+**Primary Dependencies**: Jekyll-Polyglot plugin, Gemini 2.5 Flash API (via GEMINI_API_KEY env var), Jekyll-Chirpy theme  
 **Storage**: File-based (Markdown posts, YAML data files, static assets)  
 **Testing**: Jekyll build verification, link checking, translation quality validation  
 **Target Platform**: GitHub Pages, static web hosting  
@@ -82,9 +82,10 @@ _layouts/              # Existing Chirpy layouts
 _includes/             # Language switcher components
 ├── language-toggle.html
 └── translation-status.html  
-_posts/               # Bilingual posts
-├── 2024-02-14-sophomore-notes.md (zh-CN)
-├── en/2024-02-14-sophomore-notes.md (English)
+_posts/               # Bilingual posts (Polyglot structure)
+├── 2024-02-14-sophomore-notes.md (zh-CN default)
+├── en/
+│   └── 2024-02-14-sophomore-notes.md (English)
 └── ...
 _sass/                # Styling for language features
 assets/js/            # Client-side language persistence

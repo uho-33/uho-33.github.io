@@ -39,7 +39,7 @@
 - [ ] T002 Configure Polyglot settings in _config.yml for zh-CN/en languages
 - [ ] T003 [P] Create English locale file at _data/locales/en.yml
 - [ ] T004 [P] Set up translation cache directory structure _data/translations/
-- [ ] T005 [P] Configure LLM provider settings in _config.yml with Gemini as primary
+- [ ] T005 [P] Configure LLM provider settings in _config.yml with Gemini 2.5 Flash as default, GPT-4 and Claude as alternatives
 
 ## Phase 3.2: Tests First (TDD) ⚠️ MUST COMPLETE BEFORE 3.3
 **CRITICAL: These tests MUST be written and MUST FAIL before ANY implementation**
@@ -63,13 +63,13 @@
 - [ ] T017 Modify sidebar layout in _includes/sidebar.html to include language toggle
 - [ ] T018 Update topbar layout in _includes/topbar.html to place language toggle in top right near search button
 - [ ] T019 [P] Create translation notice component in _includes/translation-notice.html
-- [ ] T020 [P] Create closeable LLM translation banner in _includes/translation-banner.html
+- [ ] T020 [P] Create closeable LLM translation banner in _includes/translation-banner.html with Chirpy theme styling, X close button, and specified warning text
 - [ ] T021 [P] Add English-specific data files in _data/en/ directory
 - [ ] T022 Update post layout in _layouts/post.html for language-specific content
 - [ ] T023 Add SEO meta tags for language alternatives in _includes/head.html
 
 ## Phase 3.5: Content Processing & Error Handling  
-- [ ] T024 Implement Chinese content detection in _plugins/content_detector.rb
+- [ ] T024 Implement Chinese content detection in _plugins/content_detector.rb with special handling for Chinese-English mixed terms like '休谟问题(Hume's problem)'
 - [ ] T025 Create batch translation processor for existing posts in _plugins/batch_processor.rb
 - [ ] T026 Implement translation quality validation and error recovery in _plugins/quality_validator.rb
 - [ ] T027 Create build hooks for automatic translation processing in _plugins/build_hooks.rb
@@ -79,7 +79,9 @@
 - [ ] T029 [P] Add link validation for bilingual URLs
 - [ ] T030 [P] Create performance benchmarks for build-time translation
 - [ ] T031 Verify GitHub Pages compatibility and deployment
-- [ ] T032 [P] Update project documentation in README.md
+- [ ] T032 [P] Create Polyglot-compatible English post files in _posts/en/ directory structure
+- [ ] T033 [P] Add US locale formatting (MM/DD/YYYY dates, US number formats) in _data/locales/en.yml
+- [ ] T034 [P] Update project documentation in README.md
 
 
 

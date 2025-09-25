@@ -75,7 +75,7 @@ A blog visitor wants to read the content in English to overcome language barrier
 - **FR-001**: System MUST provide a language toggle button visible on all pages positioned in the top right area near the search button to switch between Chinese and English modes
 - **FR-002**: System MUST pre-translate blog post content from Chinese to English using LLM during website build process
 - **FR-003**: System MUST provide complete English localization including navigation, sidebar, footer, dates, and formatting during build process
-- **FR-004**: System MUST support multiple LLM translation providers (e.g., Gemini, OpenAI, Claude, local models)
+- **FR-004**: System MUST support multiple LLM translation providers with Gemini 2.5 Flash as default, switchable to GPT-4 or Claude via configuration
 - **FR-005**: Repository owner MUST be able to configure and switch between different LLM providers through configuration files
 - **FR-006**: System MUST generate static English pages during build time to eliminate runtime translation overhead
 - **FR-007**: System MUST preserve original formatting, links, and metadata in pre-translated content
@@ -84,9 +84,10 @@ A blog visitor wants to read the content in English to overcome language barrier
 - **FR-010**: System MUST maintain user's language preference (Chinese/English) across browser sessions and page navigation
 - **FR-011**: System MUST exclude code blocks, mathematical expressions, and proper nouns from translation to preserve technical accuracy
 - **FR-012**: System MUST only retranslate content when source Chinese content has been modified, preserving existing translations otherwise
-- **FR-013**: System MUST format dates, numbers, and other locale-specific elements according to English conventions when in English mode
-- **FR-014**: System MUST only translate Chinese text content, preserving existing English, Japanese, or other non-Chinese languages as-is
-- **FR-015**: System MUST display a closeable banner in English mode informing readers that content is LLM-translated
+- **FR-013**: System MUST format dates, numbers, and other locale-specific elements according to US English conventions (en-US) when in English mode
+- **FR-014**: System MUST only translate Chinese text content, preserving existing English and Japanese as-is, except for English terms in parentheses after Chinese text (e.g., '休谟问题(Hume's problem)' where both parts get translated)
+- **FR-015**: System MUST display a closeable banner with text "This content has been translated from Chinese using AI. The original Chinese version may contain nuances not captured in translation." that appears on every English post page load, with an X close button, styled consistently with Chirpy theme
+- **FR-016**: System MUST cache translated content in Jekyll-Polyglot compatible structure using separate English markdown files in posts/en/ directory to integrate seamlessly with Polyglot's language switching
 
 
 ### Key Entities *(include if feature involves data)*
@@ -131,7 +132,7 @@ A blog visitor wants to read the content in English to overcome language barrier
 - [x] Key concepts extracted (language toggle, LLM translation, provider switching, caching)
 - [x] Ambiguities marked (content exclusion rules resolved)
 - [x] User scenarios defined (visitor experience, admin configuration, error handling)
-- [x] Requirements generated (15 functional requirements covering core functionality)
+- [x] Requirements generated (16 functional requirements covering core functionality)
 - [x] Entities identified (Translation, Provider Config, User Preference)
 - [x] Review checklist passed
 
