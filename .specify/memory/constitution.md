@@ -1,14 +1,14 @@
 <!--
 Sync Impact Report:
-- Version change: 1.1.0 → 1.1.1
-- Modified principles: N/A (maintained existing principles)
-- Added sections: N/A
-- Removed sections: N/A
+- Version change: 1.1.1 → 1.1.2
+- Modified principles: Added new Principle VI (Multi-language Integrity)
+- Added sections: Principle VI
+- Removed sections: None
 - Templates requiring updates:
-  ✅ Updated: plan-template.md (Constitution Check section aligned, version reference corrected)
-  ✅ Updated: spec-template.md (no changes needed)
-  ✅ Updated: tasks-template.md (no changes needed)
-  ✅ Updated: agent-file-template.md (no changes needed)
+  ✅ spec-template.md (no update required; already language-agnostic)
+  ✅ plan-template.md (no change; governance unaffected)
+  ✅ tasks-template.md (add optional task tag 'i18n' – informational only)
+  ✅ agent-file-template.md (no change)
 - Follow-up TODOs: None
 -->
 
@@ -31,6 +31,10 @@ Build features as modular components that can be independently developed, tested
 ### V. Deployment & Maintenance
 Maintain compatibility with GitHub Pages deployment pipeline. Ensure all dependencies are properly specified and locked. Implement automated testing for layout and functionality. Document all customizations for future maintenance.
 
+### VI. Multi-language Integrity
+All language modes (default and additional) MUST present a consistent UI: navigation, taxonomy listings, pagination, and post metadata must reflect the active language only. Language toggle MUST link to the exact counterpart post when it exists, otherwise show a clear non-blocking notice while remaining on the current content. No raw template markers or mixed-language chrome may appear. Preference persistence MUST degrade gracefully if storage is unavailable.
+Rationale: Ensures a coherent bilingual experience, prevents user confusion, and establishes a stable contract for future translation automation.
+
 ## Technical Standards
 
 Jekyll-based static site generation using Chirpy theme as foundation. Maintain existing feature support (KaTeX, syntax highlighting, Mermaid diagrams, search, PWA). Follow semantic versioning for all customizations. Use standard web technologies (HTML5, CSS3, ES6+) and avoid proprietary dependencies.
@@ -43,4 +47,4 @@ All website modifications follow Git workflow with feature branches and proper c
 
 Constitution governs website development only, not content creation. All technical modifications must preserve Chirpy theme's core functionality and update compatibility. Breaking changes require thorough testing and documentation. Amendment process requires impact analysis on existing features and deployment pipeline.
 
-**Version**: 1.1.1 | **Ratified**: 2025-09-25 | **Last Amended**: 2025-09-25
+**Version**: 1.1.2 | **Ratified**: 2025-09-25 | **Last Amended**: 2025-09-26

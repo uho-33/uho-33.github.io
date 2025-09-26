@@ -1,0 +1,128 @@
+{% comment %}
+  Translation banner component - shows general translation notice with dismissal
+  Persistent banner that appears on translated content with user dismissal
+{% endcomment %}
+
+{% if page.lang == 'en' %}
+  <div
+    id="translation-banner"
+    class="alert alert-warning alert-dismissible fade show mb-4 translation-banner"
+    role="alert"
+  >
+    <div class="d-flex align-items-start">
+      <i class="fas fa-info-circle me-3 mt-1" style="color: #856404;"></i>
+      <div class="flex-grow-1">
+        <strong>{{ site.data.locales[page.lang].translation.banner.title | default: 'Translation Notice' }}</strong>
+        <p class="mb-2 mt-1">
+          {{
+            site.data.locales[page.lang].translation.banner.text
+            | default: 'This content has been translated from Chinese using AI. The original Chinese version may contain nuances not captured in translation.'
+          }}
+        </p>
+        <small class="text-muted">
+          {{
+            site.data.locales[page.lang].translation.banner.frequency
+            | default: 'This notice appears on all translated pages and can be permanently dismissed.'
+          }}
+        </small>
+      </div>
+      <button
+        type="button"
+        class="btn-close ms-2"
+        data-dismiss-translation-banner
+        aria-label="{{ site.data.locales[page.lang].translation.banner.dismiss | default: 'Dismiss' }}"
+      ></button>
+    </div>
+  </div>
+{% endif %}
+
+<style>
+  .translation-banner {
+    border-left: 4px solid #ffc107;
+    background-color: rgba(255, 193, 7, 0.1);
+    border-color: rgba(255, 193, 7, 0.3);
+  }
+
+  .translation-banner .fas.fa-info-circle {
+    color: #856404 !important;
+  }
+
+  .translation-banner p {
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+  }
+
+  .translation-banner small {
+    font-size: 0.825rem;
+  }
+
+  /* Dark mode support */
+  [data-bs-theme='dark'] .translation-banner {
+    background-color: rgba(255, 193, 7, 0.15);
+    border-color: rgba(255, 193, 7, 0.4);
+    color: #f8f9fa;
+  }
+
+  [data-bs-theme='dark'] .translation-banner .text-muted {
+    color: #adb5bd !important;
+  }
+
+  /* Responsive design */
+  @media (max-width: 576px) {
+    .translation-banner {
+      padding: 0.75rem;
+    }
+
+    .translation-banner .fas.fa-info-circle {
+      font-size: 0.9rem;
+    }
+
+    .translation-banner p {
+      font-size: 0.9rem;
+    }
+
+    .translation-banner small {
+      font-size: 0.75rem;
+    }
+  }
+
+  /* Hide banner when dismissed */
+  .translation-banner.dismissed {
+    display: none !important;
+  }
+</style>
+
+<script>
+  // Translation banner dismissal functionality
+  document.addEventListener('DOMContentLoaded', function () {
+    const translationBanner = document.getElementById('translation-banner');
+    if (!translationBanner) return;
+
+    const dismissedKey = 'translation-banner-dismissed';
+    const dismissButton = translationBanner.querySelector('[data-dismiss-translation-banner]');
+
+    // Check if banner was previously dismissed
+    if (localStorage.getItem(dismissedKey) === 'true') {
+      translationBanner.classList.add('dismissed');
+      return;
+    }
+
+    // Handle dismiss button click
+    if (dismissButton) {
+      dismissButton.addEventListener('click', function (e) {
+        e.preventDefault();
+
+        // Store dismissal state
+        localStorage.setItem(dismissedKey, 'true');
+
+        // Add fade out animation
+        translationBanner.classList.remove('show');
+
+        // Remove from DOM after animation
+        setTimeout(function () {
+          translationBanner.classList.add('dismissed');
+        }, 150);
+      });
+    }
+  });
+</script>

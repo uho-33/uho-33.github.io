@@ -2,7 +2,6 @@
 layout: page
 # The layout for Tag page
 ---
-
 {% include lang.html %}
 
 <div id="page-tag">
@@ -11,8 +10,10 @@ layout: page
     {{ page.title }}
     <span class="lead text-muted ps-2">{{ page.posts | size }}</span>
   </h1>
+  {% assign active_lang = site.active_lang | default: site.default_lang %}
+  {% assign localized_posts = page.posts | where: 'lang', active_lang %}
   <ul class="content ps-0">
-    {% for post in page.posts %}
+    {% for post in localized_posts %}
       <li class="d-flex justify-content-between px-md-3">
         <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
         <span class="dash flex-grow-1"></span>

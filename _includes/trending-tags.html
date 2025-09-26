@@ -5,11 +5,26 @@
 {% assign size_list = '' | split: '' %}
 {% assign tag_list = '' | split: '' %}
 
-{% for tag in site.tags %}
-  {% assign size = tag | last | size %}
-  {% assign size_list = size_list | push: size %}
+{%- comment -%}
+  Limit to current language's posts to avoid cross-language noise and potential
+  malformed tag keys.
+{%- endcomment -%}
+{% assign active_lang = site.active_lang | default: site.default_lang %}
+{% assign localized_posts = site.posts | where: 'lang', active_lang %}
 
-  {% assign tag_str = tag | first | append: '::' | append: size %}
+{% assign tag_names = '' | split: '' %}
+{% for p in localized_posts %}
+  {% for t in p.tags %}
+    {% unless tag_names contains t %}
+      {% assign tag_names = tag_names | push: t %}
+    {% endunless %}
+  {% endfor %}
+{% endfor %}
+
+{% for t in tag_names %}
+  {% assign posts_size = localized_posts | where_exp: 'post', 'post.tags contains t' | size %}
+  {% assign size_list = size_list | push: posts_size %}
+  {% assign tag_str = t | append: '::' | append: posts_size %}
   {% assign tag_list = tag_list | push: tag_str %}
 {% endfor %}
 
@@ -38,8 +53,8 @@
     <h2 class="panel-heading">{{- site.data.locales[include.lang].panel.trending_tags -}}</h2>
     <div class="d-flex flex-wrap mt-3 mb-1 me-3">
       {% for tag_name in trending_tags %}
-        {% assign url = tag_name | slugify | url_encode | prepend: '/tags/' | append: '/' %}
-        <a class="post-tag btn btn-outline-primary" href="{{ url | relative_url }}">{{ tag_name }}</a>
+        {% capture _tag_url %}/tags/{{ tag_name | slugify | url_encode }}/{% endcapture %}
+        <a class="post-tag btn btn-outline-primary" href="{{ _tag_url | safe_relative_url }}">{{ tag_name }}</a>
       {% endfor %}
     </div>
   </section>

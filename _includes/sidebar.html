@@ -53,6 +53,14 @@
       {% endif %}
     {% endunless %}
 
+    <!-- Language Toggle for Sidebar -->
+    {% if site.languages.size > 1 %}
+      {% include language-toggle.html context='sidebar' %}
+      {% if site.data.contact.size > 0 %}
+        <span class="icon-border"></span>
+      {% endif %}
+    {% endif %}
+
     {% for entry in site.data.contact %}
       {% case entry.type %}
         {% when 'github', 'twitter' %}

@@ -50,6 +50,31 @@
 
   {{ seo_tags }}
 
+  <!-- Translation-specific meta tags -->
+  {% if page.lang == 'en' and page.original_language %}
+    <meta name="translation:original_language" content="{{ page.original_language }}">
+    <meta name="translation:provider" content="{{ page.translation_provider | default: 'AI' }}">
+    <meta name="translation:auto_translated" content="true">
+    <meta property="article:translated" content="true">
+
+    <!-- Language alternates for SEO -->
+    {% assign original_url = page.url | remove: '/en' | remove: '/en/' %}
+    {% if original_url != page.url %}
+      <link
+        rel="alternate"
+        hreflang="{{ page.original_language | default: 'zh-CN' }}"
+        href="{{ original_url | relative_url }}"
+      >
+    {% endif %}
+    <link rel="alternate" hreflang="en" href="{{ page.url | relative_url }}">
+
+    <!-- Open Graph translation info -->
+    <meta property="og:locale" content="en_US">
+    {% if page.original_language %}
+      <meta property="og:locale:alternate" content="{{ page.original_language | replace: '-', '_' }}">
+    {% endif %}
+  {% endif %}
+
   <title>
     {%- unless page.layout == 'home' -%}
       {{ page.title | append: ' | ' }}

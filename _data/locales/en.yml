@@ -71,12 +71,12 @@ post:
       title: Copy link
       succeed: Link copied successfully!
 
-# Date time format.
+# Date time format (US format: MM/DD/YYYY).
 # See: <http://strftime.net/>, <https://day.js.org/docs/en/display/format>
 df:
   post:
-    strftime: "%b %e, %Y"
-    dayjs: "ll"
+    strftime: "%m/%d/%Y"
+    dayjs: "MM/DD/YYYY"
   archives:
     strftime: "%b"
     dayjs: "MMM"
@@ -89,3 +89,24 @@ categories:
   post_measure:
     singular: post
     plural: posts
+
+# Translation-specific labels
+translation:
+  banner:
+    title: "Translation Notice"
+    text: "This content has been translated from Chinese using AI. The original Chinese version may contain nuances not captured in translation."
+    frequency: "This notice appears on all translated pages and can be permanently dismissed."
+    dismiss: "Dismiss"
+  language:
+    switch: "Switch Language"
+    current: "Current: English"
+  notice_title: "Auto-translated content"
+  notice_message: "This content was automatically translated from"
+  using: "using"
+  quality_disclaimer: "Translation quality may vary."
+  dismiss: "Close"
+
+# Language names for display
+languages:
+  zh-CN: "Chinese (Simplified)"
+  en: "English"

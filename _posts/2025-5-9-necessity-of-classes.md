@@ -4,6 +4,7 @@ date: 2025-5-10
 categories: [杂思, 教育]
 tags: [教育]
 description: 一些对于教育的初步看法
+lang: zh-CN
 ---
 
 > 在阅读本文前，希望读者能阅读 [关于](/about) 理解本博客定位

@@ -10,3 +10,4 @@ end
 
 gem 'tzinfo'
 gem 'tzinfo-data'
+gem 'jekyll-polyglot', '~> 1.8'

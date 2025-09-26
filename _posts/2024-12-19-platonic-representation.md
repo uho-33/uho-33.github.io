@@ -4,6 +4,7 @@ date: 2024-12-19
 categories: [科学的前路]
 tags: [哲学, 科学]
 description: 偶然发现的一篇与我看法有相似之处的实验文章
+lang: zh-CN
 ---
 
 > 在阅读本文前，希望读者能阅读[关于](/about)理解本博客定位

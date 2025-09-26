@@ -2,7 +2,6 @@
 layout: page
 # All the Categories of posts
 ---
-
 {% include lang.html %}
 
 {% assign HEAD_PREFIX = 'h_' %}
@@ -10,14 +9,23 @@ layout: page
 
 {% assign group_index = 0 %}
 
-{% assign sort_categories = site.categories | sort %}
+{%- comment -%} Build language-scoped category map {%- endcomment -%}
+{% assign active_lang = site.active_lang | default: site.default_lang %}
+{% assign localized_posts = site.posts | where: 'lang', active_lang %}
+{% assign category_names = '' | split: '' %}
+{% for p in localized_posts %}
+  {% for c in p.categories %}
+    {% unless category_names contains c %}
+      {% assign category_names = category_names | push: c %}
+    {% endunless %}
+  {% endfor %}
+{% endfor %}
+{% assign sort_categories = category_names | sort %}
 
-{% for category in sort_categories %}
-  {% assign category_name = category | first %}
-  {% assign posts_of_category = category | last %}
+{% for category_name in sort_categories %}
+  {% assign posts_of_category = localized_posts | where_exp: 'post', 'post.categories contains category_name' %}
   {% assign first_post = posts_of_category | first %}
-
-  {% if category_name == first_post.categories[0] %}
+  {% if first_post %}
     {% assign sub_categories = '' | split: '' %}
 
     {% for post in posts_of_category %}
@@ -42,10 +50,10 @@ layout: page
           <i class="far fa-folder{% if sub_categories_size > 0 %}-open{% endif %} fa-fw"></i>
 
           {% capture _category_url %}/categories/{{ category_name | slugify | url_encode }}/{% endcapture %}
-          <a href="{{ _category_url | relative_url }}" class="mx-2">{{ category_name }}</a>
+          <a href="{{ _category_url | safe_relative_url }}" class="mx-2">{{ category_name }}</a>
 
           <!-- content count -->
-          {% assign top_posts_size = site.categories[category_name] | size %}
+          {% assign top_posts_size = posts_of_category | size %}
           <span class="text-muted small font-weight-light">
             {% if sub_categories_size > 0 %}
               {{ sub_categories_size }}
@@ -107,9 +115,12 @@ layout: page
                 <i class="far fa-folder fa-fw"></i>
 
                 {% capture _sub_ctg_url %}/categories/{{ sub_category | slugify | url_encode }}/{% endcapture %}
-                <a href="{{ _sub_ctg_url | relative_url }}" class="mx-2">{{ sub_category }}</a>
+                <a href="{{ _sub_ctg_url | safe_relative_url }}" class="mx-2">{{ sub_category }}</a>
 
-                {% assign posts_size = site.categories[sub_category] | size %}
+                {% assign posts_size = localized_posts
+                  | where_exp: 'post', 'post.categories contains sub_category'
+                  | size
+                %}
                 <span class="text-muted small font-weight-light">
                   {{ posts_size }}
 

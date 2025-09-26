@@ -2,46 +2,91 @@
 layout: default
 refactor: true
 ---
-
 {% include lang.html %}
 
-{% assign pinned = site.posts | where: 'pin', 'true' %}
-{% assign default = site.posts | where_exp: 'item', 'item.pin != true and item.hidden != true' %}
+{%- comment -%}
+  Filter posts by active language so homepage only shows current language's posts.
+  Polyglot sets site.active_lang during each language build.
+{%- endcomment -%}
+{% assign localized_posts = site.posts | where: 'lang', site.active_lang %}
+{% assign pinned = localized_posts | where: 'pin', 'true' | sort: 'date' | reverse %}
+{% assign unpinned = localized_posts
+  | where_exp: 'item', 'item.pin != true and item.hidden != true'
+  | sort: 'date'
+  | reverse
+%}
 
-{% assign posts = '' | split: '' %}
+{%- comment -%}
+  Simplified per-language listing (pagination removed for now to avoid nil slots created by cross-language paginator).
+  Future enhancement: implement per-language pagination by slicing the combined list.
+{%- endcomment -%}
+{% assign posts = pinned | concat: unpinned %}
 
-<!-- Get pinned posts -->
+{%- comment -%}
+  Manual per-language pagination (Step C):
+  We avoid the built-in paginator (which mixes languages) and instead slice the
+  language-filtered posts array here. This will automatically work for both
+  zh-CN and en builds because Polyglot sets site.active_lang and page.url.
+  When total_pages == 1 the pagination UI is omitted.
+{%- endcomment -%}
+{% assign per_page = site.paginate | default: 10 %}
+{% assign total_posts = posts | size %}
+{% assign total_pages_float = total_posts | divided_by: per_page %}
+{%- comment -%}
+  Liquid integer division truncates; emulate ceil: if (total_posts % per_page) > 0 then +1
+{%- endcomment -%}
+{% assign remainder = total_posts | modulo: per_page %}
+{% assign total_pages = total_posts | divided_by: per_page %}
+{% if remainder > 0 %}{% assign total_pages = total_pages | plus: 1 %}{% endif %}
 
-{% assign offset = paginator.page | minus: 1 | times: paginator.per_page %}
-{% assign pinned_num = pinned.size | minus: offset %}
+{%- comment -%} Derive current page number from URL pattern '/page/N/' {%- endcomment -%}
+{% assign current_page = 1 %}
+{% assign segments = page.url | split: '/' %}
+{% for seg in segments %}
+  {% if seg == 'page' %}
+    {% assign idx = forloop.index0 | plus: 1 %}
+    {% assign next_seg = segments[idx] %}
+    {% if next_seg != null and next_seg != '' %}
+      {% assign current_page = next_seg | plus: 0 %}
+    {% endif %}
+  {% endif %}
+{% endfor %}
 
-{% if pinned_num > 0 %}
-  {% for i in (offset..pinned.size) limit: pinned_num %}
-    {% assign posts = posts | push: pinned[i] %}
-  {% endfor %}
-{% else %}
-  {% assign pinned_num = 0 %}
+{%- comment -%}
+  Slice posts for current page.
+{%- endcomment -%}
+{% assign offset = per_page | times: current_page | minus: per_page %}
+{% assign page_posts = posts | slice: offset, per_page %}
+
+{%- comment -%}
+  Build language-aware base prefix for links.
+{%- endcomment -%}
+{% assign base_prefix = '' %}
+{% if site.active_lang != site.default_lang %}
+  {% assign base_prefix = '/' | append: site.active_lang %}
 {% endif %}
 
-<!-- Get default posts -->
-
-{% assign default_beg = offset | minus: pinned.size %}
-
-{% if default_beg < 0 %}
-  {% assign default_beg = 0 %}
+{%- comment -%}
+  Previous / next page paths (nil when not applicable).
+{%- endcomment -%}
+{% assign previous_page_path = null %}
+{% if current_page > 1 %}
+  {% assign prev_num = current_page | minus: 1 %}
+  {% if prev_num == 1 %}
+    {% assign previous_page_path = base_prefix | append: '/' %}
+  {% else %}
+    {% assign previous_page_path = base_prefix | append: '/page/' | append: prev_num | append: '/' %}
+  {% endif %}
 {% endif %}
 
-{% assign default_num = paginator.posts | size | minus: pinned_num %}
-{% assign default_end = default_beg | plus: default_num | minus: 1 %}
-
-{% if default_num > 0 %}
-  {% for i in (default_beg..default_end) %}
-    {% assign posts = posts | push: default[i] %}
-  {% endfor %}
+{% assign next_page_path = null %}
+{% if current_page < total_pages %}
+  {% assign next_num = current_page | plus: 1 %}
+  {% assign next_page_path = base_prefix | append: '/page/' | append: next_num | append: '/' %}
 {% endif %}
 
 <div id="post-list" class="flex-grow-1 px-xl-1">
-  {% for post in posts %}
+  {% for post in page_posts %}
     <article class="card-wrapper card">
       <a href="{{ post.url | relative_url }}" class="post-preview row g-0 flex-md-row-reverse">
         {% assign card_body_col = '12' %}
@@ -110,6 +155,72 @@ refactor: true
 </div>
 <!-- #post-list -->
 
-{% if paginator.total_pages > 1 %}
-  {% include post-paginator.html %}
-{% endif %}
+{%- if total_pages > 1 -%}
+  <nav aria-label="Page Navigation">
+    <ul class="pagination align-items-center mt-4 mb-0">
+      {%- comment -%} Left arrow {%- endcomment -%}
+      {% assign prev_url = previous_page_path | default: '#' %}
+      <li class="page-item {% unless previous_page_path %}disabled{% endunless %}">
+        <a class="page-link" href="{{ prev_url | relative_url }}" aria-label="previous-page">
+          <i class="fas fa-angle-left"></i>
+        </a>
+      </li>
+
+      {%- comment -%} Page number sequence with ellipsis behavior replicating original include {%- endcomment -%}
+      {% assign left_ellipsis = false %}
+      {% assign right_ellipsis = false %}
+      {% assign page_minus_1 = current_page | minus: 1 %}
+      {% assign page_plus_1 = current_page | plus: 1 %}
+      {% assign page_minus_2 = page_minus_1 | minus: 1 %}
+      {% assign page_plus_2 = page_plus_1 | plus: 1 %}
+      {% for i in (1..total_pages) %}
+        {% assign show = false %}
+        {% if current_page == 1 %}
+          {% if i <= 3 or i == total_pages %}{% assign show = true %}{% endif %}
+        {% elsif current_page == total_pages %}
+          {% if i == 1 or i >= page_minus_2 %}{% assign show = true %}{% endif %}
+        {% else %}
+          {% if i == 1 or i == total_pages -%}
+            {%- assign show = true %}
+          {% elsif i >= page_minus_1 and i <= page_plus_1 -%}
+            {%- assign show = true -%}
+          {%- endif %}
+        {% endif %}
+
+        {% if show %}
+          <li class="page-item {% if i == current_page %} active{% endif %}">
+            <a
+              class="page-link"
+              href="{% if i > 1 %}{{ base_prefix | append: '/page/' | append: i | append: '/' | relative_url }}{% else %}{{ base_prefix | append: '/' | relative_url }}{% endif %}"
+            >
+              {{- i -}}
+            </a>
+          </li>
+        {% else %}
+          {% if i < page_minus_1 and left_ellipsis == false %}
+            <li class="page-item disabled"><span class="page-link">...</span></li>
+            {% assign left_ellipsis = true %}
+          {% elsif i > page_plus_1 and right_ellipsis == false %}
+            <li class="page-item disabled"><span class="page-link">...</span></li>
+            {% assign right_ellipsis = true %}
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+
+      <li class="page-index align-middle">
+        <span>{{ current_page }}</span>
+        <span class="text-muted">/ {{ total_pages }}</span>
+      </li>
+
+      {%- comment -%} Right arrow {%- endcomment -%}
+      {% assign next_url = next_page_path | default: '#' %}
+      <li class="page-item {% unless next_page_path %}disabled{% endunless %}">
+        <a class="page-link" href="{{ next_url | relative_url }}" aria-label="next-page">
+          <i class="fas fa-angle-right"></i>
+        </a>
+      </li>
+    </ul>
+  </nav>
+{%- endif -%}
+
+{%- comment -%} End manual per-language pagination. {%- endcomment -%}

@@ -1,0 +1,236 @@
+{%- comment -%}
+  Language Toggle Button
+  - Sidebar version: circular icon button consistent with other sidebar icons
+  - Topbar version: minimal inline icon button (no circular frame / shadow)
+  Usage:
+    {% include language-toggle.html context='sidebar' %}
+    {% include language-toggle.html context='topbar' %}
+{%- endcomment -%}
+
+{%- assign toggle_context = include.context | default: 'generic' -%}
+{%- assign default_lang = site.default_lang | default: 'zh-CN' -%}
+{%- assign page_url = page.url | default: '/' -%}
+
+{%- comment -%}
+  Intelligent counterpart resolution for posts:
+  Heuristics:
+    Chinese original slug: slug
+    English version slug may be same slug OR slug + '-en'
+    English posts may store original slug in frontmatter later (future).
+  Fallback: if not found, use language root.
+{%- endcomment -%}
+
+{%- assign english_url = '' -%}
+{%- assign chinese_url = '' -%}
+
+{%- if page.layout == 'post' -%}
+  {%- if page.lang != 'en' -%}
+    {%- assign base_slug = page.slug -%}
+    {%- assign english_posts = site.posts | where: 'lang', 'en' -%}
+    {%- assign english_match = null -%}
+    {%- for ep in english_posts -%}
+      {%- assign orig = ep.original_slug | default: '' -%}
+      {%- if ep.slug == base_slug or ep.slug == base_slug | append: '-en' or orig == base_slug -%}
+        {%- assign english_match = ep -%}
+        {%- break -%}
+      {%- endif -%}
+    {%- endfor -%}
+    {%- if english_match -%}
+      {%- assign english_url = english_match.url -%}
+    {%- else -%}
+      {%- assign english_url = '/en/' -%}
+    {%- endif -%}
+    {%- assign chinese_url = page.url -%}
+  {%- else -%}
+    {# page.lang == 'en' #}
+    {%- assign base_slug = page.original_slug | default: page.slug | replace: '-en', '' -%}
+    {%- assign zh_posts = site.posts | where: 'lang', default_lang -%}
+    {%- assign zh_match = null -%}
+    {%- for cp in zh_posts -%}
+      {%- if cp.slug == base_slug -%}
+        {%- assign zh_match = cp -%}
+        {%- break -%}
+      {%- endif -%}
+    {%- endfor -%}
+    {%- assign chinese_url = zh_match ? zh_match.url : '/' -%}
+    {%- assign english_url = page.url -%}
+  {%- endif -%}
+{%- else -%}
+  {%- comment -%} Non-post pages: keep previous simple mapping by path prefix {%- endcomment -%}
+  {%- capture english_url -%}
+    {%- if page_url == '/' -%}
+      /en/
+    {%- else -%}
+      /en{{ page_url }}
+    {%- endif -%}
+  {%- endcapture -%}
+  {%- capture chinese_url -%}
+    {%- assign candidate_url = page_url -%}
+    {%- if candidate_url == '/' -%}
+      /
+    {%- else -%}
+      {%- assign stripped = candidate_url | remove_first: '/en/' | remove_first: '/en' -%}
+      {%- if stripped == '' -%}
+        /
+      {%- else -%}
+        {{ stripped }}
+      {%- endif -%}
+    {%- endif -%}
+  {%- endcapture -%}
+{%- endif -%}
+
+{%- if site.languages.size > 1 -%}
+  {%- assign extra_class = '' -%}
+  {%- if toggle_context == 'sidebar' -%}
+    {%- assign extra_class = 'language-toggle--sidebar' -%}
+  {%- elsif toggle_context == 'topbar' -%}
+    {%- assign extra_class = 'language-toggle--topbar' -%}
+  {%- endif -%}
+  <button
+    type="button"
+    class="btn btn-link nav-link language-toggle {{ extra_class }}"
+    data-en-url="{{ english_url | strip | relative_url }}"
+    data-zh-url="{{ chinese_url | strip | relative_url }}"
+    data-default-lang="{{ default_lang }}"
+    aria-label="Switch language"
+    title="Switch language"
+  >
+    <i class="fa-solid fa-language" aria-hidden="true"></i>
+  </button>
+{%- endif -%}
+
+<script>
+  (function () {
+    const toggles = document.querySelectorAll('.language-toggle');
+    if (!toggles.length) {
+      console.warn('[LanguageToggle] No toggle buttons found');
+      return;
+    }
+
+    const path = window.location.pathname;
+    const isEnglish = path !== '/' && path.startsWith('/en/');
+    const globalDefaultLang = '{{ default_lang }}';
+
+    toggles.forEach((toggle, index) => {
+      const englishUrl = toggle.dataset.enUrl;
+      const chineseUrl = toggle.dataset.zhUrl;
+      const defaultLang = toggle.dataset.defaultLang || globalDefaultLang;
+      const targetUrl = isEnglish ? chineseUrl : englishUrl;
+      const targetLang = isEnglish ? defaultLang : 'en';
+      const label = targetLang === 'en' ? 'Switch to English' : 'Switch to Chinese';
+
+      toggle.dataset.targetUrl = targetUrl;
+      toggle.dataset.targetLang = targetLang;
+      toggle.setAttribute('aria-label', label);
+      toggle.setAttribute('title', label);
+
+      const icon = toggle.querySelector('i');
+      if (icon) {
+        icon.classList.remove('fa-globe', 'fa-language', 'fas', 'fa-solid');
+        icon.classList.add('fa-solid', 'fa-language');
+      }
+
+      toggle.addEventListener('click', function (event) {
+        event.preventDefault();
+        switchLanguage(targetUrl, targetLang);
+      });
+
+      console.log('[LanguageToggle] Initialized', {
+        index,
+        path,
+        isEnglish,
+        targetUrl,
+        targetLang,
+        englishUrl,
+        chineseUrl
+      });
+    });
+
+    // Preference-based auto redirect (runs only on root or /en/ root pages to avoid breaking deep navigation semantics)
+    try {
+      const raw = localStorage.getItem('blog_language_preference');
+      if (raw) {
+        const pref = JSON.parse(raw);
+        if (pref && pref.language && pref.expires && new Date(pref.expires) > new Date()) {
+          const desired = pref.language;
+          const onEnglish = isEnglish; // from earlier
+          if (desired === 'en' && !onEnglish && (path === '/' || path === '/index.html')) {
+            window.location.replace(toggles[0].dataset.enUrl);
+          } else if (desired !== 'en' && onEnglish && (path === '/en/' || path === '/en/index.html')) {
+            window.location.replace(toggles[0].dataset.zhUrl);
+          }
+        }
+      }
+    } catch (e) {
+      console.debug('[LanguageToggle] preference redirect skipped', e);
+    }
+  })();
+
+  function switchLanguage(url, targetLang) {
+    console.log('switchLanguage called with URL:', url, 'targetLang:', targetLang);
+
+    try {
+      localStorage.setItem(
+        'blog_language_preference',
+        JSON.stringify({
+          language: targetLang,
+          expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+        })
+      );
+      console.log('Language preference saved');
+    } catch (e) {
+      console.warn('Could not save language preference:', e);
+    }
+
+    console.log('Navigating to:', url);
+    window.location.href = url;
+  }
+
+  console.log('Language toggle script loaded. Current URL:', window.location.pathname);
+</script>
+
+<style>
+  /* Base icon sizing */
+  .language-toggle i {
+    font-size: 0.9rem;
+    line-height: 1;
+  }
+
+  /* Sidebar specific (circular framed) */
+  .language-toggle--sidebar {
+    width: 1.75rem;
+    height: 1.75rem;
+    margin-bottom: 0.5rem;
+    border-radius: 50%;
+    color: var(--sidebar-btn-color);
+    background-color: var(--sidebar-btn-bg);
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: none;
+  }
+  .language-toggle--sidebar:not(:focus-visible) {
+    box-shadow: var(--sidebar-border-color) 0 0 0 1px;
+  }
+  .language-toggle--sidebar:hover {
+    background-color: var(--sidebar-hover-bg);
+  }
+
+  /* Topbar specific: no frame, inherit text color, inline like other topbar buttons */
+  .language-toggle--topbar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0.25rem;
+    border: none;
+    background: transparent;
+    box-shadow: none !important;
+    margin: 0;
+  }
+  .language-toggle--topbar:hover {
+    background: transparent;
+    color: var(--topbar-text-color);
+  }
+</style>

@@ -8,7 +8,6 @@ tail_includes:
   - post-nav
   - comments
 ---
-
 {% include lang.html %}
 
 <article class="px-1">
@@ -94,6 +93,12 @@ tail_includes:
       </div>
     </div>
   </header>
+
+  <!-- Translation components for English content -->
+  {% if lang == 'en' %}
+    {% include translation-banner.html %}
+    {% include translation-notice.html %}
+  {% endif %}
 
   <div class="content">
     {{ content }}

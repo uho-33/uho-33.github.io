@@ -1,0 +1,104 @@
+name: Build and Deploy Jekyll site to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.0"
+          bundler-cache: true
+
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v4
+
+      - name: Configure translation environment
+        run: |
+          echo "JEKYLL_ENV=production" >> $GITHUB_ENV
+          # Only enable auto-translation for scheduled builds to avoid rate limits
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            echo "JEKYLL_AUTO_TRANSLATE=true" >> $GITHUB_ENV
+          else
+            echo "JEKYLL_AUTO_TRANSLATE=false" >> $GITHUB_ENV
+          fi
+
+      - name: Build with Jekyll
+        run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
+        env:
+          JEKYLL_ENV: production
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      - name: Test site
+        run: |
+          # Basic site validation
+          test -f _site/index.html
+          test -d _site/en || echo "Warning: No English translations found"
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  # Optional: Scheduled translation job to update English content
+  translate:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.0"
+          bundler-cache: true
+
+      - name: Run batch translation
+        run: |
+          export JEKYLL_BATCH_TRANSLATE=true
+          export GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}"
+          bundle exec jekyll build --config _config.yml
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      - name: Commit updated translations
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add _posts/en/ _data/translations/
+          git diff --staged --quiet || git commit -m "Auto-update English translations [skip ci]"
+          git push
