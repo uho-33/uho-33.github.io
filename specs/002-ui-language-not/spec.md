@@ -61,13 +61,13 @@ As a bilingual reader, I want the site UI (navigation labels, buttons, taxonomy 
 1. **Given** I am viewing the root homepage (no language slug) in Chinese (default), **When** I toggle to English, **Then** I am taken to the `/en/` homepage with only English posts and fully English UI chrome (menus, labels, dates formatting, taxonomy, pagination, footer, search placeholder).
 2. **Given** I am reading a Chinese post that has an English counterpart, **When** I click the language switch, **Then** I am taken directly to the English counterpart URL (not the English homepage) and the UI is fully English.
 3. **Given** I am reading an English post that has a Chinese counterpart, **When** I click the language switch, **Then** I am taken directly to the Chinese counterpart URL (root path, no `/zh-CN/` slug) with fully Chinese UI.
-4. **Given** I am on a post whose target-language counterpart does not exist, **When** I click the language switch, **Then** I stay on the same post and a non-blocking toast/modal appears stating the translation is not available (no navigation occurs).
+4. **Given** I am on a post whose target-language counterpart does not exist, **When** I click the language switch, **Then** I stay on the same post and a non-blocking toast appears stating the translation is not available (no navigation occurs).
 5. **Given** I previously chose English on any page, **When** I later revisit the site root `/` without a language segment within the same browser session, **Then** I am automatically shown the English homepage (`/en/`); after the session ends (browser closed), default Chinese root is shown again until I toggle.
 6. **Given** I view any post (English or Chinese), **When** it renders, **Then** no raw template/Liquid syntax strings are visible.
 7. **Given** I switch languages from any paginated homepage page (page N>1), **When** the target language loads, **Then** I always land on that language's page 1 (page index is not preserved).
 
 ### Edge Cases
-- Post exists in one language only: toggle stays on the current post and shows a missing-translation toast/modal (Scenario 4) with copy (EN) "This post has not been translated yet." / (ZH) "该文章尚未翻译".
+- Post exists in one language only: toggle stays on the current post and shows a missing-translation toast (Scenario 4) with copy (EN) "This post has not been translated yet." / (ZH) "该文章尚未翻译".
 - User stored preference points to English but only Chinese content currently available: show an empty English posts list with the empty‑state message (EN) "No posts yet in this language." / (ZH) "该文章尚未翻译" (UI remains English; preference retained).
 - Deep links (manual URL entry) to a non‑existent translation counterpart (obsolete or never created): perform a 302 redirect to an existing available language variant URL and display the missing‑translation toast after load.
 - Browser with disabled localStorage: toggle still functions (navigation) but preference is not persisted.
@@ -81,7 +81,7 @@ As a bilingual reader, I want the site UI (navigation labels, buttons, taxonomy 
 - **FR-001**: The site MUST render all navigational and UI text (menus, breadcrumbs, headings like "Post", pagination labels, search placeholder, tag/category headings) in the currently active language.
 - **FR-002**: The active language MUST be applied consistently on every page type (homepage, post pages, category listing, tag listing, archives, pagination pages) without mixing languages in UI chrome.
 - **FR-003**: The language toggle on a post page MUST navigate directly to that post's translation when it exists.
-- **FR-004**: If a direct counterpart does not exist, the toggle MUST remain on the current post and display a non-blocking toast/modal indicating the translation is not available.
+- **FR-004**: If a direct counterpart does not exist, the toggle MUST remain on the current post and display a non-blocking toast indicating the translation is not available.
 - **FR-005**: The toggle MUST persist the user language preference ONLY for the current browser session (no cross-session persistence); a new browser session MUST revert to default Chinese unless toggled again.
 - **FR-006**: The system MUST NOT display raw template or Liquid syntax (e.g., `{# page.lang == 'en' #}`) in the rendered page.
 - **FR-007**: The system MUST correctly infer whether the current page is in a non-default language to build the correct counterpart URL.
@@ -98,7 +98,7 @@ As a bilingual reader, I want the site UI (navigation labels, buttons, taxonomy 
 - **FR-018**: The toggle MUST always navigate to the opposite language version (or fallback behavior in FR-004); it MUST NOT trigger a no-op or same-language reload because the control never points to the current language.
  - **FR-019**: If preferred/active language has zero posts, homepage MUST render an empty-state in that language with message (EN) "No posts yet in this language." / (ZH) "该文章尚未翻译" and MUST NOT fall back to another language's content.
  - **FR-020**: Direct navigation (manual URL) to a non-existent translation counterpart MUST result in an HTTP 302 redirect to an existing available language variant URL followed by display of the missing-translation toast (copy per Edge Cases) in that variant's UI language.
- - **FR-021**: Missing-translation toast parameters: position top-center, visible 5000ms, dismissible via explicit close button or Esc key; ARIA role="status" (aria-live="polite").
+ - **FR-021**: Missing-translation toast MUST appear when target translation is unavailable, with parameters defined in contract specification; ARIA role="status" (aria-live="polite").
  - **FR-022**: Every post MUST declare `original_slug`; build MUST fail with a clear error if any post omits it.
  - **FR-023**: `original_slug` acts as a language-neutral group key; any language (English or Chinese) may be the first authored version—there is no tracked or implied canonical "source" language even though Chinese is the default UI at root.
  - **FR-024**: Temporary defensive `relative_url` wrappers MUST be retained until first production deployment of this feature branch; thereafter they MUST be removed (tracked as a de-instrumentation task) while keeping any safe helper filter if still needed.
@@ -109,7 +109,7 @@ As a bilingual reader, I want the site UI (navigation labels, buttons, taxonomy 
  - **FR-029**: If the origin variant cannot be resolved for a post with `translated: true`, the disclaimer MUST render with copy (EN) "Original missing" / (ZH) "原文缺失" (no link) and a build-time WARNING MUST be emitted.
  - **FR-030**: If more than one post shares the same (`original_slug`, `lang`) pair, the system MUST keep ONLY the post with the latest `date` value and emit a build warning listing the discarded file paths; all earlier duplicates MUST be excluded from listings, pagination, and counterpart resolution.
  - **FR-031**: Missing-translation toast and disclaimer announcements MUST NOT steal or move keyboard focus; focus remains on the triggering control. Screen readers announce via aria-live polite only.
- - **FR-032**: All validator warnings/errors MUST use a simple human-readable single-line format prefixed with level tag (e.g., `[WARN] Duplicate original_slug='x' lang='en' kept='file.md' dropped='old.md'`; `[ERROR] Missing original_slug in 'path.md'`). No structured JSON is required.
+ - **FR-032**: All validator warnings/errors MUST use a simple human-readable single-line format prefixed with `LANG-TX | LEVEL | CODE | message` (e.g., `LANG-TX | WARN | DUP_VARIANT | original_slug='x' lang='en' kept='file.md' dropped='old.md'`; `LANG-TX | ERROR | MISSING_ORIGINAL_SLUG | path='path.md'`). No structured JSON is required.
 
 ### Key Entities *(include if feature involves data)*
 - **Post Translation Mapping**: Represents association (grouping) of all language variants of the same conceptual post.
