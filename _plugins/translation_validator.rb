@@ -219,15 +219,8 @@ module Jekyll
                              # For Chinese posts, origin should point to English version if available
                              if variant.lang == 'en' && origin.lang == @default_lang
                                # English post -> point to Chinese original
-                               # Use original_slug to construct the correct Chinese URL
-                               original_slug = variant.doc.data['original_slug']
-                               if original_slug
-                                 "/posts/#{original_slug}/"
-                               else
-                                 # Fallback: remove /en/ prefix from current post URL
-                                 chinese_url = variant.doc.url
-                                 chinese_url.start_with?('/en/') ? chinese_url.sub('/en/', '/') : chinese_url
-                               end
+                               # Use the actual URL from the origin document
+                               ensure_leading_slash(origin.doc.url)
                              elsif variant.lang == @default_lang
                                # Chinese post -> point to English version if available
                                en_variant = variants.find { |v| v.lang == 'en' }
