@@ -17,6 +17,7 @@ timezone: Asia/Shanghai
 title: Kohi's blog # the main title
 
 tagline: 存放些零零散散的想法 # it will display as the sub-title
+tagline_en: "A place to store scattered thoughts" # English tagline
 
 description: >- # used by seo meta and the atom feed
 
@@ -226,26 +227,7 @@ default_lang: "zh-CN"
 exclude_from_localization: ["javascript", "images", "css", "assets"]
 parallel_localization: false # Disable parallel processing for Windows compatibility
 
-# LLM Translation Configuration
-translation:
-  enabled: false
-  default_provider: "gemini"
-  providers:
-    gemini:
-      model: "gemini-2.0-flash-exp"
-      api_key_env: "GEMINI_API_KEY"
-      max_tokens: 4096
-      rate_limit: 15 # requests per minute
-    openai:
-      model: "gpt-4"
-      api_key_env: "OPENAI_API_KEY"
-      max_tokens: 4096
-      rate_limit: 3
-    claude:
-      model: "claude-3-sonnet-20240229"
-      api_key_env: "CLAUDE_API_KEY"
-      max_tokens: 4096
-      rate_limit: 5
+# (Removed) LLM Translation Configuration
 
 jekyll-archives:
   enabled: [categories, tags]

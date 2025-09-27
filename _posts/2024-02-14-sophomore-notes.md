@@ -40,8 +40,8 @@ original_slug: 2024-02-14-sophomore-notes
 
   由此，我们可以得出，学生是否拥有逃课的权利，起决于学生是否承担了自我发展的主要责任。
 
-  >
-  >
+  
+  
   >我的论述除了注释中提到的问题外，还存在着一个问题，即“责任”指的是什么。我尝试将它定义为由于决策结果与预期结果的差异对对象产生的代价。但这样会带来其他的问题，如如何比较不同的代价（因为我使用了“主要责任”的概念）。暂时想不动了≡(▔﹏▔)≡
 
 
@@ -69,9 +69,7 @@ original_slug: 2024-02-14-sophomore-notes
 
    
 
-   > 
-   >
-   >  ***Universal approximation theorem*** ：对于 $$\mathbb{R}^{D_i}$$ 上一紧凑子集中的任意一个连续函数，在任意给定精度下，都存在着神经网络能逼近该函数。（There exists a network that can approximate any given continuous function on a compact subset of $$\mathbb{R}^{D_i}$$ to arbitrary accuracy.）
+   > ***Universal approximation theorem*** ：对于 $$\mathbb{R}^{D_i}$$ 上一紧凑子集中的任意一个连续函数，在任意给定精度下，都存在着神经网络能逼近该函数。（There exists a network that can approximate any given continuous function on a compact subset of $$\mathbb{R}^{D_i}$$ to arbitrary accuracy.）
    
 2. 虽然休谟的归纳问题否定了我们证实科学理论正确性的可能性，但这并不意味着我们不能得到一个正确的科学理论，那么我们的科学理论是否能做到精确预测未来？
 
@@ -95,4 +93,4 @@ original_slug: 2024-02-14-sophomore-notes
 
 ---
 
-### 脚注：
+### 脚注

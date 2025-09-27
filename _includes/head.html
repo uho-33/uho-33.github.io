@@ -72,13 +72,8 @@
     {% endif %}
   {% endif %}
 
-  {% if page.lang and page.original_language and page.lang != page.original_language %}
-    <meta name="translation:original_language" content="{{ page.original_language }}">
-    <meta name="translation:provider" content="{{ page.translation_provider | default: 'AI' }}">
-    <meta name="translation:auto_translated" content="{{ page.translated | default: true }}">
-    <meta property="article:translated" content="true">
+  {% if page.lang %}
     <meta property="og:locale" content="{{ page.lang | replace: '-', '_' }}">
-    <meta property="og:locale:alternate" content="{{ page.original_language | replace: '-', '_' }}">
   {% endif %}
 
   <title>
