@@ -161,7 +161,13 @@ module Jekyll
 
             map = {}
           variants.each do |variant|
-            map[variant.lang] = ensure_leading_slash(finalize_url(variant.doc.url, variant.doc))
+            variant_url = ensure_leading_slash(finalize_url(variant.doc.url, variant.doc))
+            # For the default language, always use the normalized content_path to avoid language prefixes
+            if variant.lang == @default_lang
+              map[variant.lang] = ensure_leading_slash(content_path)
+            else
+              map[variant.lang] = variant_url
+            end
           end
 
           synthetic_langs = []
@@ -392,8 +398,18 @@ module Jekyll
       def finalize_url(url, doc)
         return url if url.nil? || url.empty?
         return url unless url.include?(':')
-        title_token = doc.data['slug'] || doc.data['title'] || doc.basename_without_ext
-        slug = title_token.to_s.downcase.strip.gsub(/[^a-z0-9\-\s]/,'').gsub(/\s+/,'-')
+        # Prefer the document's computed slug (from filename), not title.
+        # This preserves language suffixes like "-en" and avoids drifting slugs from human-readable titles.
+        raw_slug = if doc.respond_to?(:slug) && doc.slug
+          doc.slug
+        elsif doc.data['slug']
+          doc.data['slug'].to_s
+        else
+          # Derive from basename, stripping leading date if present (YYYY-MM-DD-)
+          base = doc.basename_without_ext.to_s
+          base.sub(/^\d{4}-\d{1,2}-\d{1,2}-/, '')
+        end
+        slug = raw_slug.to_s.downcase.strip.gsub(/[^a-z0-9\-\s]/,'').gsub(/\s+/,'-')
         url.gsub(':title', slug)
       end
 

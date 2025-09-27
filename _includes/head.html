@@ -62,13 +62,16 @@
     {% for pair in pairs %}
       {% assign lang_code = pair[0] %}
       {% assign lang_url  = pair[1] %}
-      {%- if lang_code == site.default_lang -%}
-        {%- comment -%} Default language should not be double-prefixed; ensure URL from map has no leading /default_lang unless that's canonical. {%- endcomment -%}
-      {%- endif -%}
-      <link rel="alternate" hreflang="{{ lang_code | downcase }}" href="{{ lang_url | relative_url }}">
+      {%- comment -%}
+        The translation_permalink_map already contains normalized URLs:
+        - Default language (zh-CN): /posts/slug/
+        - Non-default (en): /en/posts/slug-en/
+        Use them directly without further normalization.
+      {%- endcomment -%}
+      <link rel="alternate" hreflang="{{ lang_code | downcase }}" href="{{ lang_url }}">
     {% endfor %}
     {% if site.default_lang and tx_map[site.default_lang] %}
-      <link rel="alternate" hreflang="x-default" href="{{ tx_map[site.default_lang] | relative_url }}">
+      <link rel="alternate" hreflang="x-default" href="{{ tx_map[site.default_lang] }}">
     {% endif %}
   {% endif %}
 
