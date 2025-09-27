@@ -9,6 +9,7 @@ original_language: zh-CN
 original_slug: 2024-02-14-sophomore-notes
 translation_provider: manual
 translated_at: 2025-01-14T12:00:00Z
+translated: true
 ---
 
 This semester I moved to Zhuhai. The overall feeling is that the population density is not as high as in Guangzhou, it's relatively quieter, and the roads are also wider than those in Guangzhou. For transportation, since there's no subway, it's not very convenient to go to relatively distant places. As for food, there aren't as many brand stores nearby as in Guangzhou; mostly they are independently operated shops. The overall feeling is somewhat similar to Chenggong.

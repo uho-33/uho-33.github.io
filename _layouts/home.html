@@ -8,7 +8,11 @@ refactor: true
   Filter posts by active language so homepage only shows current language's posts.
   Polyglot sets site.active_lang during each language build.
 {%- endcomment -%}
-{% assign localized_posts = site.posts | where: 'lang', site.active_lang %}
+{%- comment -%} Debug: site.active_lang = "{{ site.active_lang }}", total posts = {{ site.posts | size }} {%- endcomment -%}
+{% assign all_lang_posts = site.posts | where: 'lang', site.active_lang %}
+{%- comment -%} Filter out synthetic posts for homepage listings (FR-019, FR-025) {%- endcomment -%}
+{% assign localized_posts = all_lang_posts | where_exp: 'item', 'item.synthetic_translation != true' %}
+{%- comment -%} Debug: localized posts for lang="{{ site.active_lang }}" = {{ localized_posts | size }}, all posts = {{ all_lang_posts | size }} {%- endcomment -%}
 {% assign pinned = localized_posts | where: 'pin', 'true' | sort: 'date' | reverse %}
 {% assign unpinned = localized_posts
   | where_exp: 'item', 'item.pin != true and item.hidden != true'
@@ -86,6 +90,19 @@ refactor: true
 {% endif %}
 
 <div id="post-list" class="flex-grow-1 px-xl-1">
+  {%- comment -%} Empty state when no posts in current language (FR-019) {%- endcomment -%}
+  {% if page_posts.size == 0 %}
+    <div class="d-flex flex-column align-items-center justify-content-center py-5">
+      <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+      <h3 class="text-muted">
+        {%- if site.active_lang == 'en' -%}
+          No posts yet in this language.
+        {%- else -%}
+          该文章尚未翻译
+        {%- endif -%}
+      </h3>
+    </div>
+  {% else %}
   {% for post in page_posts %}
     <article class="card-wrapper card">
       <a href="{{ post.url | relative_url }}" class="post-preview row g-0 flex-md-row-reverse">
@@ -152,6 +169,7 @@ refactor: true
       </a>
     </article>
   {% endfor %}
+  {% endif %}
 </div>
 <!-- #post-list -->
 

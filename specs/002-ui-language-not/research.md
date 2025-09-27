@@ -53,12 +53,12 @@ Decision: Only hard fail on schema corruption (nil required fields). Warnings fo
 Rationale: Author productivity; incremental adoption.
 
 ## Open Risks & Mitigations
-| Risk | Impact | Mitigation |
-|------|--------|-----------|
-| Author forgets `original_slug` | Orphaned variant & broken toggle | Validator warning + add quickstart checklist |
-| Large future language expansion | Potential performance | Hash-based indexing O(n) fine up to thousands |
-| Over-aggressive disclaimer placement | Visual clutter | Narrow condition `(translated == true)` only |
-| JS disabled | No toggle behavior | Provide static link list for available langs; hidden when JS enhances |
+| Risk                                 | Impact                           | Mitigation                                                            |
+| ------------------------------------ | -------------------------------- | --------------------------------------------------------------------- |
+| Author forgets `original_slug`       | Orphaned variant & broken toggle | Validator warning + add quickstart checklist                          |
+| Large future language expansion      | Potential performance            | Hash-based indexing O(n) fine up to thousands                         |
+| Over-aggressive disclaimer placement | Visual clutter                   | Narrow condition `(translated == true)` only                          |
+| JS disabled                          | No toggle behavior               | Provide static link list for available langs; hidden when JS enhances |
 
 ## Data Points / References
 - Jekyll hook order: `:post_read` safe for content enumeration before generator plugins.

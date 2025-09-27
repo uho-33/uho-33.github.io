@@ -1,10 +1,15 @@
 {% comment %}
   Detect appearance language and return it through variable "lang"
+  Priority: 1) Polyglot site.active_lang 2) page.lang 3) site.lang 4) default 'en'
 {% endcomment %}
-{% if site.data.locales[page.lang] %}
-  {% assign lang = page.lang %}
-{% elsif site.data.locales[site.lang] %}
-  {% assign lang = site.lang %}
-{% else %}
-  {% assign lang = 'en' %}
-{% endif %}
+{%- if site.active_lang and site.data.locales[site.active_lang] -%}
+  {%- assign lang = site.active_lang -%}
+{%- elsif site.data.locales[page.lang] -%}
+  {%- assign lang = page.lang -%}
+{%- elsif site.data.locales[site.lang] -%}
+  {%- assign lang = site.lang -%}
+{%- else -%}
+  {%- assign lang = 'en' -%}
+{%- endif -%}
+{%- comment -%} Ensure page.lang reflects resolved lang for downstream templates {%- endcomment -%}
+{% assign page.lang = lang %}

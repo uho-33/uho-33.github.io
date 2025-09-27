@@ -23,8 +23,8 @@ Provide a consistent, accessible, non-blocking notification when a user requests
 ```
 <div id="lang-toast-container" class="lang-toast-wrapper" aria-live="polite" role="status">
   <div class="lang-toast" data-lang="en">
-    <span class="lang-toast__message">This post has not been translated yet.</span>
-    <button type="button" class="lang-toast__close" aria-label="Close notification">×</button>
+    <span class="lang-toast-message">This post has not been translated yet.</span>
+    <button type="button" class="lang-toast-close" aria-label="Close notification">×</button>
   </div>
 </div>
 ```
@@ -32,8 +32,8 @@ Provide a consistent, accessible, non-blocking notification when a user requests
 ## Styling Hooks
 - Wrapper: `.lang-toast-wrapper`
 - Toast: `.lang-toast`
-- Message: `.lang-toast__message`
-- Close button: `.lang-toast__close`
+- Message: `.lang-toast-message`
+- Close button: `.lang-toast-close`
 
 ## Accessibility
 - Esc key listener removes toast if present.

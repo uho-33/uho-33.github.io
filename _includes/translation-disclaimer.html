@@ -1,0 +1,42 @@
+{%- comment -%}
+  Translation disclaimer include.
+  Usage:
+    {% include translation-disclaimer.html info=disclaimer_hash %}
+  Expected keys: should_render (bool), reason, source_lang, target_lang, provider, translated_at, origin_url.
+{%- endcomment -%}
+
+{%- assign disclaimer = include.info | default: page.translation_disclaimer -%}
+
+{%- if disclaimer and disclaimer.should_render -%}
+  {%- assign lang = page.lang | default: site.active_lang | default: site.default_lang -%}
+  {%- assign source_lang_name = site.data.locales[lang].languages[disclaimer.source_lang] | default: disclaimer.source_lang -%}
+  
+  <div class="translation-disclaimer-callout">
+    <div class="translation-disclaimer-callout__icon">
+      <i class="fas fa-language"></i>
+    </div>
+    <div class="translation-disclaimer-callout__content">
+      <p class="translation-disclaimer-callout__text">
+        {%- if lang == 'en' -%}
+          This article is a translation from <strong>{{ source_lang_name }}</strong>. Some nuances may be lost in translation.
+        {%- else -%}
+          本文译自<strong>{{ source_lang_name }}</strong>，翻译过程中可能存在细微差异。
+        {%- endif -%}
+      </p>
+      {%- if disclaimer.origin_url -%}
+        {%- assign default_lang = site.default_lang | default: 'zh-CN' -%}
+        {%- capture permalink_map_json -%}{ "{{ default_lang }}": "{{ disclaimer.origin_url }}" }{%- endcapture -%}
+        <a
+          class="translation-disclaimer-callout__link"
+          href="{{ disclaimer.origin_url }}"
+          data-component="language-toggle"
+          data-active-lang="{{ lang }}"
+          data-default-lang="{{ default_lang }}"
+          data-permalink-map="{{ permalink_map_json | replace: '"', '&quot;' }}"
+        >
+          {%- if lang == 'en' -%}View original{%- else -%}查看原文{%- endif -%}
+        </a>
+      {%- endif -%}
+    </div>
+  </div>
+{%- endif -%}

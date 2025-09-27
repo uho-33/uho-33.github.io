@@ -4,6 +4,8 @@ date: 2024-02-14
 categories: [小记, 大学]
 tags: [小记]
 description: 大二上回顾
+lang: zh-CN
+original_slug: 2024-02-14-sophomore-notes
 
 ---
 

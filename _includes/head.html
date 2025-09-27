@@ -50,29 +50,35 @@
 
   {{ seo_tags }}
 
-  <!-- Translation-specific meta tags -->
-  {% if page.lang == 'en' and page.original_language %}
+  <!-- Translation & hreflang (Polyglot + validator) -->
+  {% assign tx_map = page.translation_permalink_map %}
+  {% if tx_map %}
+    {%- comment -%}
+      Liquid's 'keys' filter is not guaranteed; sorting a hash returns an array of [key,value] pairs.
+      We explicitly iterate pairs to avoid producing array string in hreflang attribute.
+    {%- endcomment -%}
+    {% assign pairs = tx_map | sort %}
+    {% assign current_lang = page.lang | default: site.lang | default: site.default_lang %}
+    {% for pair in pairs %}
+      {% assign lang_code = pair[0] %}
+      {% assign lang_url  = pair[1] %}
+      {%- if lang_code == site.default_lang -%}
+        {%- comment -%} Default language should not be double-prefixed; ensure URL from map has no leading /default_lang unless that's canonical. {%- endcomment -%}
+      {%- endif -%}
+      <link rel="alternate" hreflang="{{ lang_code | downcase }}" href="{{ lang_url | relative_url }}">
+    {% endfor %}
+    {% if site.default_lang and tx_map[site.default_lang] %}
+      <link rel="alternate" hreflang="x-default" href="{{ tx_map[site.default_lang] | relative_url }}">
+    {% endif %}
+  {% endif %}
+
+  {% if page.lang and page.original_language and page.lang != page.original_language %}
     <meta name="translation:original_language" content="{{ page.original_language }}">
     <meta name="translation:provider" content="{{ page.translation_provider | default: 'AI' }}">
-    <meta name="translation:auto_translated" content="true">
+    <meta name="translation:auto_translated" content="{{ page.translated | default: true }}">
     <meta property="article:translated" content="true">
-
-    <!-- Language alternates for SEO -->
-    {% assign original_url = page.url | remove: '/en' | remove: '/en/' %}
-    {% if original_url != page.url %}
-      <link
-        rel="alternate"
-        hreflang="{{ page.original_language | default: 'zh-CN' }}"
-        href="{{ original_url | relative_url }}"
-      >
-    {% endif %}
-    <link rel="alternate" hreflang="en" href="{{ page.url | relative_url }}">
-
-    <!-- Open Graph translation info -->
-    <meta property="og:locale" content="en_US">
-    {% if page.original_language %}
-      <meta property="og:locale:alternate" content="{{ page.original_language | replace: '-', '_' }}">
-    {% endif %}
+    <meta property="og:locale" content="{{ page.lang | replace: '-', '_' }}">
+    <meta property="og:locale:alternate" content="{{ page.original_language | replace: '-', '_' }}">
   {% endif %}
 
   <title>

@@ -94,11 +94,7 @@ tail_includes:
     </div>
   </header>
 
-  <!-- Translation components for English content -->
-  {% if lang == 'en' %}
-    {% include translation-banner.html %}
-    {% include translation-notice.html %}
-  {% endif %}
+  {% include translation-disclaimer.html %}
 
   <div class="content">
     {{ content }}

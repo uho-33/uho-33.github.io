@@ -14,7 +14,13 @@
     <h1 class="site-title">
       <a href="{{ '/' | relative_url }}">{{ site.title }}</a>
     </h1>
-    <p class="site-subtitle fst-italic mb-0">{{ site.tagline }}</p>
+    <p class="site-subtitle fst-italic mb-0">
+      {%- if site.active_lang == 'en' and site.tagline_en -%}
+        {{ site.tagline_en }}
+      {%- else -%}
+        {{ site.tagline }}
+      {%- endif -%}
+    </p>
   </header>
   <!-- .profile-wrapper -->
 
@@ -54,11 +60,9 @@
     {% endunless %}
 
     <!-- Language Toggle for Sidebar -->
-    {% if site.languages.size > 1 %}
-      {% include language-toggle.html context='sidebar' %}
-      {% if site.data.contact.size > 0 %}
-        <span class="icon-border"></span>
-      {% endif %}
+    {% include language-toggle.html context='sidebar' %}
+    {% if site.data.contact.size > 0 %}
+      <span class="icon-border"></span>
     {% endif %}
 
     {% for entry in site.data.contact %}

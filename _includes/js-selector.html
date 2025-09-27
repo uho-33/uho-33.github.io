@@ -90,6 +90,9 @@
   {% include mermaid.html %}
 {% endif %}
 
+<!-- Language Toggle -->
+<script src="{{ '/assets/js/language-toggle.js' | relative_url }}"></script>
+
 {% if jekyll.environment == 'production' %}
   <!-- PWA -->
   {% if site.pwa.enabled %}

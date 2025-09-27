@@ -1,7 +1,6 @@
 ---
 layout: compress
 ---
-
 <!doctype html>
 
 {% include origin-type.html %}
@@ -12,8 +11,54 @@ layout: compress
   {% capture prefer_mode %}data-mode="{{ site.theme_mode }}"{% endcapture %}
 {% endif %}
 
+{%- comment -%}
+  Template-based language resolution (no post-write mutation):
+  Order of precedence
+    1. Explicit page.lang (already normalized by include 'lang.html')
+    2. Match against translation_permalink_map (exact current URL)
+    3. Path prefix /<lang>/ detection for non-default languages
+  After resolution, page.lang is updated so downstream SEO tags use the right locale.
+{%- endcomment -%}
+{%- assign html_lang = page.lang | default: lang | default: site.lang | default: site.default_lang -%}
+{%- assign current_url = page.url | relative_url -%}
+
+{%- comment -%} Override with polyglot active_lang if available (ensures correct lang even when URLs lack prefix) {%- endcomment -%}
+{%- if site.active_lang and site.active_lang != '' -%}
+  {%- assign html_lang = site.active_lang -%}
+{%- endif -%}
+{%- if page.synthetic_translation and page.lang -%}
+  {%- assign html_lang = page.lang -%}
+{%- endif -%}
+{%- assign page.lang = html_lang -%}
+
+{%- if page.translation_permalink_map -%}
+  {%- for kv in page.translation_permalink_map -%}
+    {%- assign t_lang = kv[0] -%}
+    {%- assign t_url = kv[1] | relative_url -%}
+    {%- if t_url == current_url -%}
+      {%- assign html_lang = t_lang -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+
+{%- assign configured_langs = site.languages | default: site.config.languages -%}
+{%- if configured_langs -%}
+  {%- for l in configured_langs -%}
+    {%- unless l == site.default_lang -%}
+      {%- assign prefix = '/' | append: l | append: '/' -%}
+      {%- assign prefix_len = prefix | size -%}
+      {%- assign current_start = current_url | slice: 0, prefix_len -%}
+      {%- if current_start == prefix -%}
+        {%- assign html_lang = l -%}
+      {%- endif -%}
+    {%- endunless -%}
+  {%- endfor -%}
+{%- endif -%}
+
+{%- assign page.lang = html_lang -%}
+
 <!-- `site.alt_lang` can specify a language different from the UI -->
-<html lang="{{ page.lang | default: site.alt_lang | default: site.lang }}" {{ prefer_mode }}>
+<html lang="{{ html_lang | default: site.default_lang | default: 'en' }}" {{ prefer_mode }}>
   {% include head.html %}
 
   <body>

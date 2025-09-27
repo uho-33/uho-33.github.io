@@ -15,6 +15,16 @@
 }
 
 header {
+  .post-language-toggle {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+
+    .language-toggle {
+      margin: 0;
+    }
+  }
+
   .post-desc {
     @extend %heading;
 

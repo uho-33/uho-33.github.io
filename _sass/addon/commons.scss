@@ -835,11 +835,28 @@ $btn-mb: 0.5rem;
 
     a {
       @extend %button;
+      @extend %sidebar-links;
       @extend %sidebar-link-hover;
       @extend %clickable-transition;
 
+      // Match mode toggle styling
+      background-color: var(--sidebar-btn-bg);
+      border: 1px solid var(--sidebar-border-color);
+
       &:not(:last-child) {
         margin-right: $sb-btn-gap;
+      }
+
+      &:not(:focus-visible) {
+        box-shadow: var(--sidebar-border-color) 0 0 0 1px;
+      }
+
+      &:hover {
+        background-color: var(--sidebar-hover-bg);
+      }
+
+      i {
+        color: var(--sidebar-btn-color);
       }
     }
 
@@ -851,6 +868,51 @@ $btn-mb: 0.5rem;
       @extend %button;
       @extend %sidebar-links;
       @extend %sidebar-link-hover;
+
+      // Remove dark border to match other sidebar buttons
+      &:not(:focus-visible) {
+        box-shadow: none;
+      }
+    }
+
+    .language-toggle {
+      @extend %button;
+      @extend %sidebar-links;
+      @extend %sidebar-link-hover;
+
+      margin-right: $sb-btn-gap;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      // Match mode toggle styling
+      background-color: var(--sidebar-btn-bg);
+      border: 1px solid var(--sidebar-border-color);
+
+      &:not(:focus-visible) {
+        box-shadow: var(--sidebar-border-color) 0 0 0 1px;
+      }
+
+      &:hover {
+        background-color: var(--sidebar-hover-bg);
+      }
+
+      .language-toggle-icon {
+        font-family: 'Font Awesome 6 Free', sans-serif;
+        font-weight: 900;
+
+        color: var(--sidebar-btn-color);
+
+        &::before {
+          content: '\f1ab'; /* fa-language */
+        }
+      }
+
+      .language-toggle-text {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
     }
 
     .icon-border {
@@ -866,6 +928,73 @@ $btn-mb: 0.5rem;
     }
   } /* .sidebar-bottom */
 } /* #sidebar */
+
+/* Translation Disclaimer Callout */
+.translation-disclaimer-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  margin: 1.5rem 0;
+  background-color: var(--callout-bg, #f8f9fa);
+  border: 1px solid var(--callout-border, #e9ecef);
+  border-left: 4px solid var(--callout-accent, #007bff);
+  border-radius: 0.375rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+  &__icon {
+    flex-shrink: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--callout-accent, #007bff);
+    font-size: 0.875rem;
+  }
+
+  &__content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__text {
+    margin: 0 0 0.5rem 0;
+    color: var(--text-color, #333);
+    font-size: 0.875rem;
+    line-height: 1.5;
+
+    strong {
+      color: var(--callout-accent, #007bff);
+    }
+  }
+
+  &__link {
+    display: inline-block;
+    color: var(--callout-accent, #007bff);
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--callout-accent, #007bff);
+    border-radius: 0.25rem;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: var(--callout-accent, #007bff);
+      color: white;
+      text-decoration: none;
+    }
+  }
+}
+
+/* Dark mode support */
+[data-mode="dark"] .translation-disclaimer-callout {
+  --callout-bg: #2d3748;
+  --callout-border: #4a5568;
+  --callout-accent: #63b3ed;
+  --text-color: #e2e8f0;
+}
 
 @media (hover: hover) {
   #sidebar ul > li:last-child::after {
@@ -920,6 +1049,42 @@ $btn-mb: 0.5rem;
           padding: 0 0.3rem;
         }
       }
+    }
+  }
+
+  .language-toggle--topbar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem 0.5rem;
+    margin-right: 0.5rem;
+    background-color: transparent;
+    border: none;
+    color: var(--sidebar-btn-color);
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+
+    &:hover {
+      background-color: var(--sidebar-hover-bg);
+      color: var(--text-color);
+    }
+
+    .language-toggle-icon {
+      font-family: 'Font Awesome 6 Free', sans-serif;
+      font-weight: 900;
+
+      &::before {
+        content: '\f1ab'; /* fa-language */
+        font-size: 0.9rem;
+        margin-right: 0.25rem;
+      }
+    }
+
+    .language-toggle-text {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
   }
 } /* #topbar */
@@ -1432,7 +1597,7 @@ search {
 
 @media all and (min-width: 1200px) {
   search {
-    margin-right: 4rem;
+    margin-right: 1.25rem;
   }
 
   #search-input {
@@ -1479,9 +1644,7 @@ search {
   }
 
   search {
-    margin-right: calc(
-      $main-content-max-width / 4 - $search-max-width - 0.75rem
-    );
+    margin-right: 1.25rem;
   }
 
   #main-wrapper > .container {
