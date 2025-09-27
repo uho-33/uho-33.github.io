@@ -220,24 +220,29 @@ module Jekyll
             needs_disclaimer = variant.is_translated || (variant.original_language && variant.original_language != variant.lang)
 
             if needs_disclaimer
-              origin_url = if origin
-                             # For English posts, origin should point to Chinese version (default lang)
-                             # For Chinese posts, origin should point to English version if available
-                             if variant.lang == 'en' && origin.lang == @default_lang
-                               # English post -> point to Chinese original
-                               # Use the actual URL from the origin document
-                               ensure_leading_slash(origin.doc.url)
-                             elsif variant.lang == @default_lang
-                               # Chinese post -> point to English version if available
-                               en_variant = variants.find { |v| v.lang == 'en' }
-                               en_variant ? ensure_leading_slash(en_variant.doc.url) : ensure_leading_slash(origin.doc.url)
-                             else
-                               ensure_leading_slash(origin.doc.url)
-                             end
-                           elsif variant.original_language
-                             target = variants.find { |v| v.lang == variant.original_language }
-                             target ? ensure_leading_slash(target.doc.url) : nil
-                           end
+              permalink_map = variant.doc.data['translation_permalink_map'] || {}
+
+              target_lang = nil
+              if variant.original_language && variant.original_language != variant.lang
+                target_lang = variant.original_language
+              elsif origin && origin.lang != variant.lang
+                target_lang = origin.lang
+              end
+
+              origin_url = nil
+              if target_lang
+                mapped = permalink_map[target_lang]
+                origin_url = ensure_leading_slash(mapped) if mapped
+              end
+
+              if origin_url.nil? && origin
+                origin_url = ensure_leading_slash(finalize_url(origin.doc.url, origin.doc))
+              end
+
+              if origin_url.nil? && variant.original_language
+                target = variants.find { |v| v.lang == variant.original_language }
+                origin_url = ensure_leading_slash(finalize_url(target.doc.url, target.doc)) if target
+              end
 
               disclaimer_reason = if origin_url.nil?
                                      'origin_missing'

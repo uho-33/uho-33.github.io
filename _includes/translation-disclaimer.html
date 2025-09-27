@@ -25,43 +25,10 @@
       </p>
       {%- if disclaimer.origin_url -%}
         {%- assign default_lang = site.default_lang | default: 'zh-CN' -%}
-        {%- assign target_lang = disclaimer.source_lang -%}
         {%- assign base_map = page.translation_permalink_map -%}
         {%- assign permalink_map_json = null -%}
         {%- if base_map and base_map != empty -%}
-          {%- comment -%}
-            Normalize URLs from pre-Polyglot stage:
-            - Ensure non-default languages have leading '/<lang>/'
-            - Ensure default language is NOT prefixed with '/<default>/'
-          {%- endcomment -%}
-          {%- assign pairs = base_map | sort -%}
-          {%- capture _fixed -%}{
-            {%- for pair in pairs -%}
-              {%- assign lang_code = pair[0] -%}
-              {%- assign url_val  = pair[1] -%}
-              {%- if forloop.first == false -%}, {%- endif -%}
-              {%- if lang_code == default_lang -%}
-                {%- assign def_prefix = '/' | append: default_lang | append: '/' -%}
-                {%- if url_val and url_val != '' and url_val contains def_prefix -%}
-                  {%- assign normalized = url_val | remove_first: def_prefix -%}
-                {%- else -%}
-                  {%- assign normalized = url_val -%}
-                {%- endif -%}
-              {%- else -%}
-                {%- assign has_prefix = '/' | append: lang_code | append: '/' -%}
-                {%- assign hp_len = has_prefix | size -%}
-                {%- assign head = url_val | slice: 0, hp_len -%}
-                {%- if url_val and url_val != '' and head == has_prefix -%}
-                  {%- assign normalized = url_val -%}
-                {%- else -%}
-                  {%- assign without_leading = url_val | remove_first: '/' -%}
-                  {%- assign normalized = '/' | append: lang_code | append: '/' | append: without_leading -%}
-                {%- endif -%}
-              {%- endif -%}
-              "{{ lang_code }}": "{{ normalized | replace: '//' , '/' }}"
-            {%- endfor -%}
-          }{%- endcapture -%}
-          {%- assign permalink_map_json = _fixed | strip -%}
+          {%- capture permalink_map_json -%}{{ base_map | jsonify }}{%- endcapture -%}
         {%- else -%}
           {%- capture permalink_map_json -%}{ "{{ default_lang }}": "{{ disclaimer.origin_url }}" }{%- endcapture -%}
         {%- endif -%}
