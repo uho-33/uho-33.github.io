@@ -65,7 +65,7 @@ module Jekyll
         rescue => e
           log(:warn, :METRICS_WRITE_FAILED, e.message)
         end
-    log(:info, :METRICS, "translation_validator duration_ms=#{duration_ms} groups=#{@groups.size} posts=#{@site.posts.docs.size}")
+    log(:debug, :METRICS, "translation_validator duration_ms=#{duration_ms} groups=#{@groups.size} posts=#{@site.posts.docs.size}")
       end
 
       private
@@ -139,55 +139,42 @@ module Jekyll
       end
 
       def build_permalink_map
-        supported = Array(@site.config['languages']).reject(&:nil?)
+        supported = Array(@site.config['languages']).reject(&:nil?).map(&:to_s)
         return if supported.empty?
 
         @groups.each_value do |variants|
-          # Determine canonical base path from default language variant if present else first variant
-          origin_variant = variants.find { |v| v.lang == @default_lang } || variants.first
+          origin_variant = variants.find { |v| v.lang.to_s == @default_lang } || variants.first
           next unless origin_variant
-          origin_url = ensure_leading_slash(finalize_url(origin_variant.doc.url, origin_variant.doc))
 
-          # Normalize base path (strip any leading /<lang> for non-default origin)
-          content_path = origin_url.dup
-          supported.each do |lang_code|
-            prefix = "/#{lang_code}/"
-            if content_path.start_with?(prefix)
-              content_path = content_path.sub(prefix, '/')
-              break
-            end
-          end
-          # content_path now like /posts/slug/ (leading slash retained)
+          origin_url = ensure_trailing_slash(ensure_leading_slash(finalize_url(origin_variant.doc.url, origin_variant.doc)))
+          content_path = strip_language_prefix(origin_url, supported)
+          canonical_default = ensure_trailing_slash(content_path)
+          slug_base = extract_slug_base(content_path)
 
-            map = {}
-          variants.each do |variant|
-            variant_url = ensure_leading_slash(finalize_url(variant.doc.url, variant.doc))
-            # For the default language, always use the normalized content_path to avoid language prefixes
-            if variant.lang == @default_lang
-              map[variant.lang] = ensure_leading_slash(content_path)
-            else
-              map[variant.lang] = variant_url
-            end
-          end
-
+          canonical_map = {}
           synthetic_langs = []
-          supported.each do |lang|
-            next if map.key?(lang)
-            if lang == @default_lang
-              # Expected default path is content_path
-              map[lang] = ensure_leading_slash(content_path)
+
+          canonical_map[@default_lang] = canonical_default
+
+          variants_by_lang = variants.each_with_object({}) do |variant, acc|
+            acc[variant.lang.to_s] = variant
+          end
+
+          supported.each do |lang_code|
+            lang_str = lang_code.to_s
+            if lang_str == @default_lang
+              canonical_map[lang_str] = canonical_default
             else
-              # Prepend lang prefix
-              normalized = content_path == '/' ? '/' : content_path
-              map[lang] = ensure_leading_slash("/#{lang}#{normalized}")
+              canonical_map[lang_str] = ensure_trailing_slash(build_fallback_url(slug_base, lang_str))
+              synthetic_langs << lang_str unless variants_by_lang.key?(lang_str)
             end
-            synthetic_langs << lang
           end
 
           variants.each do |variant|
-            existing = variant.doc.data['translation_permalink_map'] || {}
-            variant.doc.data['translation_permalink_map'] = existing.merge(map)
+            variant.doc.data['translation_permalink_map'] = canonical_map.dup
+            variant.doc.data['translation_permalink_map_normalized'] = canonical_map.dup
             variant.doc.data['translation_permalink_map_synthetic'] = synthetic_langs unless synthetic_langs.empty?
+            log(:debug, :PERMALINK_MAP, "slug=#{variant.doc.data['original_slug']} lang=#{variant.lang} map=#{canonical_map}")
           end
         end
       end
@@ -230,9 +217,23 @@ module Jekyll
               end
 
               origin_url = nil
+              mapped = nil
               if target_lang
                 mapped = permalink_map[target_lang]
+                unless mapped
+                  key_string = target_lang.to_s
+                  mapped = permalink_map[key_string] ||
+                           permalink_map[key_string.downcase] ||
+                           permalink_map[key_string.upcase] ||
+                           permalink_map[key_string.tr('-', '_')] ||
+                           permalink_map[key_string.tr('-', '_').downcase]
+                end
                 origin_url = ensure_leading_slash(mapped) if mapped
+              end
+
+              if variant.lang == 'en'
+                log(:debug, :DISCLAIMER_LOOKUP,
+                    "slug=#{slug} variant_lang=#{variant.lang} target_lang=#{target_lang.inspect} mapped=#{mapped.inspect} origin_url=#{origin_url.inspect} map_keys=#{permalink_map.keys}")
               end
 
               if origin_url.nil? && origin
@@ -244,7 +245,36 @@ module Jekyll
                 origin_url = ensure_leading_slash(finalize_url(target.doc.url, target.doc)) if target
               end
 
-              disclaimer_reason = if origin_url.nil?
+              disclaimer_origin_url = origin_url
+              disclaimer_target_lang = target_lang
+
+              if disclaimer_origin_url.nil? && origin
+                disclaimer_origin_url = ensure_leading_slash(finalize_url(origin.doc.url, origin.doc))
+                disclaimer_target_lang ||= origin.lang if origin
+              end
+
+              if disclaimer_origin_url.nil? && variant.original_language
+                target = variants.find { |v| v.lang == variant.original_language }
+                if target
+                  disclaimer_origin_url = ensure_leading_slash(finalize_url(target.doc.url, target.doc))
+                  disclaimer_target_lang ||= target.lang
+                end
+              end
+
+              if variant.lang == 'en'
+                log(:debug, :DISCLAIMER_LOOKUP,
+                    "slug=#{slug} variant_lang=#{variant.lang} target_lang=#{target_lang.inspect} mapped=#{mapped.inspect} origin_url=#{origin_url.inspect} disclaimer_origin=#{disclaimer_origin_url.inspect} map_keys=#{permalink_map.keys}")
+              end
+
+              final_origin_url = origin_url
+
+              if disclaimer_origin_url
+                final_origin_url = disclaimer_origin_url
+              else
+                final_origin_url = origin_url
+              end
+
+              disclaimer_reason = if final_origin_url.nil?
                                      'origin_missing'
                                    elsif variant.is_translated
                                      'translated_flag'
@@ -259,11 +289,12 @@ module Jekyll
                 'target_lang' => variant.lang,
                 'provider' => variant.translation_provider,
                 'translated_at' => variant.translated_at,
-                'origin_url' => origin_url
+                'origin_url' => final_origin_url,
+                'origin_lang' => disclaimer_target_lang || @default_lang
               }
 
               log_reason = variant.is_translated ? 'translated_flag' : 'inferred'
-              log(:info, :DISCLAIMER_APPLIED,
+              log(:debug, :DISCLAIMER_APPLIED,
                   "original_slug=#{slug} lang=#{variant.lang} reason=#{log_reason}")
             else
               fm['translation_disclaimer'] = { 'should_render' => false }
@@ -295,9 +326,19 @@ module Jekyll
             # If origin is a post, create a synthetic rendered copy in missing language instead of a redirect.
             if origin.doc.is_a?(Jekyll::Document) && origin.doc.collection.label == 'posts'
               rel_origin = origin_url.sub(%r{^/}, '') # posts/doubt-science/
-              dir = File.join(lang, File.dirname(rel_origin))
+              
+              # Prevent double language prefixes in directory creation
+              clean_rel_origin = rel_origin
+              supported.each do |lang_code|
+                if clean_rel_origin.start_with?("#{lang_code}/#{lang_code}/")
+                  clean_rel_origin = clean_rel_origin.sub("#{lang_code}/", '')
+                  break
+                end
+              end
+              
+              dir = File.join(lang, File.dirname(clean_rel_origin))
               name = 'index.html'
-              target_url = ensure_leading_slash("/#{lang}/" + rel_origin)
+              target_url = ensure_leading_slash("/#{lang}/" + clean_rel_origin)
 
               next if @site.pages.any? { |p| p.url == target_url }
 
@@ -396,6 +437,42 @@ module Jekyll
       def ensure_leading_slash(url)
         return nil if url.nil? || url.empty?
         url.start_with?('/') ? url : "/#{url}"
+      end
+
+      def ensure_trailing_slash(url)
+        return '/' if url.nil? || url.empty?
+        url.end_with?('/') ? url : "#{url}/"
+      end
+
+      def strip_language_prefix(url, supported)
+        result = url.dup
+        supported.each do |lang_code|
+          prefix = "/#{lang_code}/"
+          if result.start_with?(prefix)
+            result = result.sub(prefix, '/')
+            break
+          end
+        end
+
+        supported.each do |lang_code|
+          double_prefix = "/#{lang_code}/#{lang_code}/"
+          if result.start_with?(double_prefix)
+            result = result.sub("/#{lang_code}/", '/')
+            break
+          end
+        end
+
+        result
+      end
+
+      def extract_slug_base(content_path)
+        base = content_path.sub(%r{^/}, '').sub(%r{/$}, '')
+        base.sub(%r{^posts/}, '')
+      end
+
+      def build_fallback_url(slug_base, lang_code)
+        return "/#{lang_code}/posts/" if slug_base.nil? || slug_base.empty?
+        "/#{lang_code}/posts/#{slug_base}-#{lang_code}/"
       end
 
       # Some URLs may still contain placeholder tokens like :title (when defaults/permalink not yet

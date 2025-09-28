@@ -51,27 +51,14 @@
   {{ seo_tags }}
 
   <!-- Translation & hreflang (Polyglot + validator) -->
-  {% assign tx_map = page.translation_permalink_map %}
-  {% if tx_map %}
-    {%- comment -%}
-      Liquid's 'keys' filter is not guaranteed; sorting a hash returns an array of [key,value] pairs.
-      We explicitly iterate pairs to avoid producing array string in hreflang attribute.
-    {%- endcomment -%}
-    {% assign pairs = tx_map | sort %}
-    {% assign current_lang = page.lang | default: site.lang | default: site.default_lang %}
-    {% for pair in pairs %}
-      {% assign lang_code = pair[0] %}
-      {% assign lang_url  = pair[1] %}
-      {%- comment -%}
-        The translation_permalink_map already contains normalized URLs:
-        - Default language (zh-CN): /posts/slug/
-        - Non-default (en): /en/posts/slug-en/
-        Use them directly without further normalization.
-      {%- endcomment -%}
-      <link rel="alternate" hreflang="{{ lang_code | downcase }}" href="{{ lang_url }}">
-    {% endfor %}
-    {% if site.default_lang and tx_map[site.default_lang] %}
-      <link rel="alternate" hreflang="x-default" href="{{ tx_map[site.default_lang] }}">
+  {% assign canonical_map = page.translation_permalink_map_normalized %}
+  {% if canonical_map %}
+    <!-- canonical_map: {{ canonical_map }} -->
+    {% if canonical_map['en'] %}
+      <link rel="alternate" hreflang="en" href="{{ canonical_map['en'] | absolute_url }}">
+    {% endif %}
+    {% if canonical_map['zh-CN'] %}
+      <link rel="alternate" hreflang="zh-cn" href="{{ canonical_map['zh-CN'] | absolute_url }}">
     {% endif %}
   {% endif %}
 

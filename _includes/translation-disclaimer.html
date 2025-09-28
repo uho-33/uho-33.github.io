@@ -24,21 +24,10 @@
         {%- endif -%}
       </p>
       {%- if disclaimer.origin_url -%}
-        {%- assign default_lang = site.default_lang | default: 'zh-CN' -%}
-        {%- assign base_map = page.translation_permalink_map -%}
-        {%- assign permalink_map_json = null -%}
-        {%- if base_map and base_map != empty -%}
-          {%- capture permalink_map_json -%}{{ base_map | jsonify }}{%- endcapture -%}
-        {%- else -%}
-          {%- capture permalink_map_json -%}{ "{{ default_lang }}": "{{ disclaimer.origin_url }}" }{%- endcapture -%}
-        {%- endif -%}
         <a
           class="translation-disclaimer-callout__link"
-          href="{{ disclaimer.origin_url }}"
-          data-component="language-toggle"
-          data-active-lang="{{ lang }}"
-          data-default-lang="{{ default_lang }}"
-          data-permalink-map="{{ permalink_map_json | replace: '"', '&quot;' }}"
+          href="{{ disclaimer.origin_url | absolute_url }}"
+          data-origin-url="{{ disclaimer.origin_url | absolute_url }}"
         >
           {%- if lang == 'en' -%}View original{%- else -%}查看原文{%- endif -%}
         </a>
