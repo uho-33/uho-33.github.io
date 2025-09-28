@@ -3,7 +3,7 @@ title: 正解はない? — On Living as a Human
 date: 2025-8-23
 categories: [Collected Thoughts]
 tags: [Scattered Thoughts, Living, Questions, Anime]
-description: 
+description: Collected Thoughts
 lang: en
 original_slug: 2025-8-21-seikai
 translated: true
