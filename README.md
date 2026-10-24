@@ -43,6 +43,18 @@
 
 To learn how to use, develop, and upgrade the project, please refer to the [Wiki][wiki].
 
+### Google Drive OAuth 说明页
+
+`gdrive-privacy-and-terms.md` 发布为 `https://uho-33.github.io/gdrive/`，内容来自个人 rclone 工具的说明、隐私政策与使用条款。
+
+- 应用首页：`https://uho-33.github.io/gdrive/`
+- 隐私政策：`https://uho-33.github.io/gdrive/#privacy`
+- 使用条款：`https://uho-33.github.io/gdrive/#terms`
+
+该页不加入 `_tabs` 或 `_posts`，因此不会进入首页文章列表、侧栏导航或站内搜索；`sitemap: false` 排除站点地图，`robots: noindex, nofollow` 请求搜索引擎不要收录。页面公开可访问，隐藏入口不构成访问控制。`tmp/` 草稿目录不参与构建。
+
+更新政策请编辑此页面，保留固定路径与锚点。发布后再将上述链接填入 Google OAuth 应用配置；提供政策页面本身不保证 OAuth 令牌长期有效。
+
 ## Contributing
 
 Contributions (_pull requests_, _issues_, and _discussions_) are what make the open-source community such an amazing place

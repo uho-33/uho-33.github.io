@@ -214,6 +214,7 @@ exclude:
   - docs
   - tools
   - README.md
+  - tmp
   - LICENSE
   - "*.config.js"
   - package*.json
